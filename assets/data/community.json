@@ -111,7 +111,7 @@
     "Learning languages through music, menus and patient conversation.",
     "A morning swimmer with a soft spot for bookstores and late jazz.",
     "Architecture walks, indie cinema and conversations that wander somewhere new.",
-    "Sharing small wins, useful local finds and a carefully edited camera roll."
+    "Sharing small wins, useful neighborhood finds and a carefully edited camera roll."
   ],
   "interestCatalog": [
     "City walks",
@@ -204,34 +204,42 @@
   "reels": [
     {
       "video": "sunlit-sidewalk.mp4",
+      "thumbnail": "reel-stills/sunlit-sidewalk.jpg",
       "caption": "Morning light and nowhere to rush.  ·  #citywalk #daylight"
     },
     {
       "video": "evening-driving-range.mp4",
+      "thumbnail": "reel-stills/evening-driving-range.jpg",
       "caption": "One last swing before the sky turns blue.  ·  #drivingrange"
     },
     {
       "video": "railway-greenway.mp4",
+      "thumbnail": "reel-stills/railway-greenway.jpg",
       "caption": "Old rails, new trees, quiet miles.  ·  #greenway #slowcity"
     },
     {
       "video": "boulevard-selfie.mp4",
+      "thumbnail": "reel-stills/boulevard-selfie.jpg",
       "caption": "A quick hello from my favorite corner.  ·  #streetmood"
     },
     {
       "video": "brownstone-style.mp4",
+      "thumbnail": "reel-stills/brownstone-style.jpg",
       "caption": "Clean lines against warm brick.  ·  #citystyle #brownstones"
     },
     {
       "video": "cliffside-dive.mp4",
+      "thumbnail": "reel-stills/cliffside-dive.jpg",
       "caption": "The calm breath before the jump.  ·  #cliffside #bluewater"
     },
     {
       "video": "trail-conversation.mp4",
+      "thumbnail": "reel-stills/trail-conversation.jpg",
       "caption": "Trail talks are better without a clock.  ·  #goodcompany"
     },
     {
       "video": "canal-city-walk.mp4",
+      "thumbnail": "reel-stills/canal-city-walk.jpg",
       "caption": "Following the canal until the city softens.  ·  #waterside"
     }
   ],

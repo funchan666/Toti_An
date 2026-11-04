@@ -53,7 +53,7 @@ void main() {
     expect(label('Agree to continue'), findsOneWidget);
     await tester.tap(label('OK'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byType(Checkbox));
+    await tester.tap(find.byKey(const ValueKey('accept-terms')));
     await tester.tap(label('Quick login'));
     await tester.pumpAndSettle();
     expect(label('Welcome to Toti'), findsOneWidget);
@@ -81,9 +81,6 @@ void main() {
     expect(label('Glow After Dark'), findsOneWidget);
     await tester.tap(label('Glow After Dark'));
     await tester.pumpAndSettle();
-    expect(label('Enter room'), findsOneWidget);
-    await tester.tap(label('Enter room'));
-    await tester.pumpAndSettle();
     expect(label('Join stage'), findsOneWidget);
     await tester.enterText(find.byType(TextField).last, 'Hello, room');
     await tester.tap(label('Send'));
@@ -96,9 +93,7 @@ void main() {
     expect(app.store.get('coins', 0), 863);
     await tester.tap(label('OK'));
     await tester.pumpAndSettle();
-    await tester.tap(label('Back'));
-    await tester.pumpAndSettle();
-    await tester.tap(label('Back'));
+    await tester.tap(find.byTooltip('Back'));
     await tester.pumpAndSettle();
     await tester.tap(label('Profile').last);
     await tester.pumpAndSettle();
@@ -181,7 +176,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(label('Profile').last);
     await tester.pumpAndSettle();
-    await tester.tap(label('Settings'));
+    await tester.tap(find.byTooltip('Settings'));
     await tester.pumpAndSettle();
     await tester.tap(label('App language'));
     await tester.pumpAndSettle();
@@ -206,11 +201,11 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(label('Profile').last);
     await tester.pumpAndSettle();
-    await tester.tap(label('Settings'));
+    await tester.tap(find.byTooltip('Settings'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(label('Delete local account data'));
+    await tester.ensureVisible(label('Delete account data'));
     await tester.pumpAndSettle();
-    await tester.tap(label('Delete local account data'));
+    await tester.tap(label('Delete account data'));
     await tester.pumpAndSettle();
     await tester.tap(label('Delete'));
     await tester.pumpAndSettle();

@@ -71,32 +71,78 @@ class TotiApp extends StatelessWidget {
               fontSize: 13,
               fontWeight: FontWeight.w700,
             ),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         ),
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(
             minimumSize: const Size(48, 48),
-            textStyle: const TextStyle(fontFamily: 'Quicksand', fontWeight: FontWeight.w700),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            textStyle: const TextStyle(
+              fontFamily: 'Quicksand',
+              fontWeight: FontWeight.w700,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
           ),
         ),
         chipTheme: ChipThemeData(
           backgroundColor: panel,
           selectedColor: const Color(0xff593286),
-          labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          labelStyle: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
           secondaryLabelStyle: const TextStyle(color: Colors.white),
           side: BorderSide.none,
           showCheckmark: false,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: panel,
           hintStyle: const TextStyle(color: muted),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide.none,
+          ),
+        ),
+        dialogTheme: DialogThemeData(
+          backgroundColor: panel,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          titleTextStyle: const TextStyle(
+            fontFamily: 'SpaceGrotesk',
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+        ),
+        bottomSheetTheme: BottomSheetThemeData(
+          backgroundColor: panel,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+          ),
+          clipBehavior: Clip.antiAlias,
+        ),
+        switchTheme: SwitchThemeData(
+          thumbColor: WidgetStateProperty.resolveWith(
+            (states) =>
+                states.contains(WidgetState.selected) ? Colors.white : muted,
+          ),
+          trackColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.selected) ? pink : panel2,
+          ),
         ),
         useMaterial3: true,
       ),
@@ -161,23 +207,100 @@ Widget photo(String name, {BoxFit fit = BoxFit.cover}) => Image.asset(
 Widget avatar(String name, {double size = 48}) => ClipOval(
   child: SizedBox(width: size, height: size, child: photo(name)),
 );
-// Each fifth of the original artwork is one navigation pictogram.
+Widget myAvatar({double size = 48, String? previewPath}) {
+  final path = previewPath ?? store.get('avatarPath', '') as String;
+  return ClipOval(
+    child: SizedBox(
+      width: size,
+      height: size,
+      child: path.isEmpty
+          ? photo('riverside-black-dress.jpg')
+          : Image.file(
+              File(path),
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => photo('riverside-black-dress.jpg'),
+            ),
+    ),
+  );
+}
+
+// Each fifth of the original artwork is one pictogram.
+Widget spriteArtwork(String asset, int index, {double size = 26}) => SizedBox(
+  width: size,
+  height: size,
+  child: ClipRect(
+    child: Stack(
+      clipBehavior: Clip.hardEdge,
+      children: [
+        Positioned(
+          left: -index * size,
+          top: -(size * 5 / 3 - size) / 2,
+          child: Image.asset(asset, width: size * 5),
+        ),
+      ],
+    ),
+  ),
+);
 Widget navigationArtwork(int index, {bool selected = false}) => Opacity(
   opacity: selected ? 1 : .62,
-  child: SizedBox(
-    width: 26,
-    height: 26,
-    child: ClipRect(
-      child: Stack(
-        clipBehavior: Clip.hardEdge,
-        children: [
-          Positioned(
-            left: -index * 26.0,
-            top: -(130 / 3 - 26) / 2,
-            child: Image.asset('assets/art/toti-navigation-icons.png', width: 130),
-          ),
-        ],
-      ),
+  child: spriteArtwork('assets/art/toti-navigation-icons.png', index),
+);
+Widget actionArtwork(int index, {double size = 22}) => ExcludeSemantics(
+  child: spriteArtwork('assets/art/toti-action-icons.png', index, size: size),
+);
+Widget cardArtwork(int index, {double size = 32}) => ExcludeSemantics(
+  child: spriteArtwork('assets/art/toti-card-icons.png', index, size: size),
+);
+Widget utilityArtwork(int index, {double size = 26}) => ExcludeSemantics(
+  child: spriteArtwork('assets/art/toti-utility-icons.png', index, size: size),
+);
+Widget controlArtwork(int index, {double size = 24}) => ExcludeSemantics(
+  child: spriteArtwork('assets/art/toti-control-icons.png', index, size: size),
+);
+Widget reelArtwork(int index, {double size = 28}) => ExcludeSemantics(
+  child: spriteArtwork('assets/art/toti-reel-icons.png', index, size: size),
+);
+Widget giftArtwork(int index, {double size = 64}) => ExcludeSemantics(
+  child: spriteArtwork('assets/art/toti-gift-icons.png', index, size: size),
+);
+Widget roomToolbarArtwork(int index, {double size = 24}) => ExcludeSemantics(
+  child: spriteArtwork(
+    'assets/art/toti-room-toolbar-icons.png',
+    index,
+    size: size,
+  ),
+);
+Widget discoveryArtwork(int index, {double size = 24}) => ExcludeSemantics(
+  child: spriteArtwork(
+    'assets/art/toti-discovery-icons.png',
+    index,
+    size: size,
+  ),
+);
+Widget inboxArtwork(int index, {double size = 36}) => ExcludeSemantics(
+  child: spriteArtwork('assets/art/toti-inbox-icons.png', index, size: size),
+);
+Widget memberActionArtwork(int index, {double size = 26}) => ExcludeSemantics(
+  child: spriteArtwork('assets/art/toti-member-actions.png', index, size: size),
+);
+Widget iconLabel(Widget icon, String label) => Row(
+  mainAxisSize: MainAxisSize.min,
+  children: [icon, const SizedBox(width: 6), TText(label)],
+);
+Widget emptyState(String message, {int artwork = 3}) => Center(
+  child: Padding(
+    padding: const EdgeInsets.all(24),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        cardArtwork(artwork, size: 64),
+        const SizedBox(height: 12),
+        TText(
+          message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: muted),
+        ),
+      ],
     ),
   ),
 );
@@ -188,7 +311,9 @@ Widget action(String label, VoidCallback onTap, {bool primary = false}) =>
         style: FilledButton.styleFrom(
           backgroundColor: primary ? pink : panel2,
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
         ),
         onPressed: onTap,
         child: TText(label, textAlign: TextAlign.center),
@@ -207,10 +332,46 @@ Widget card(
   EdgeInsetsGeometry padding = const EdgeInsets.all(16),
 }) => Material(
   color: panel,
-  borderRadius: BorderRadius.circular(16),
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(16),
+    side: const BorderSide(color: Color(0xff392552)),
+  ),
   clipBehavior: Clip.antiAlias,
   child: Padding(padding: padding, child: child),
 );
+Widget listCard(Widget child) => Padding(
+  padding: const EdgeInsets.only(bottom: 8),
+  child: card(child, padding: EdgeInsets.zero),
+);
+
+class TotiPressable extends StatefulWidget {
+  const TotiPressable({required this.onTap, required this.child, super.key});
+  final VoidCallback onTap;
+  final Widget child;
+  @override
+  State<TotiPressable> createState() => _TotiPressableState();
+}
+
+class _TotiPressableState extends State<TotiPressable> {
+  bool pressed = false;
+  @override
+  Widget build(BuildContext context) => Material(
+    color: Colors.transparent,
+    child: InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: widget.onTap,
+      onHighlightChanged: (value) => setState(() => pressed = value),
+      child: AnimatedScale(
+        scale: pressed && !MediaQuery.of(context).disableAnimations ? .98 : 1,
+        duration: MediaQuery.of(context).disableAnimations
+            ? Duration.zero
+            : const Duration(milliseconds: 140),
+        curve: Curves.easeOut,
+        child: widget.child,
+      ),
+    ),
+  );
+}
 
 class Screen extends StatelessWidget {
   final String title;
@@ -226,11 +387,15 @@ class Screen extends StatelessWidget {
         child: TextButton(
           style: TextButton.styleFrom(padding: EdgeInsets.zero),
           onPressed: () => Navigator.maybePop(c),
-          child: const TText('Back'),
+          child: iconLabel(controlArtwork(0, size: 16), 'Back'),
         ),
       ),
       leadingWidth: 76,
-      title: TText(title),
+      title: Semantics(
+        label: tr(title),
+        header: true,
+        child: const SizedBox.shrink(),
+      ),
       actions: actions,
     ),
     body: SafeArea(child: child),
@@ -265,24 +430,40 @@ class _LoginState extends State<Login> {
                   textAlign: TextAlign.center,
                 ),
                 const Spacer(),
-                action('Quick login', () {
-                  if (!accepted) {
-                    notice(
-                      c,
-                      'Agree to continue',
-                      'Please review and accept the Terms of Service and Privacy Policy.',
-                    );
-                    return;
-                  }
-                  store.login();
-                }, primary: true),
+                SizedBox(
+                  width: double.infinity,
+                  child: action('Quick login', () {
+                    if (!accepted) {
+                      notice(
+                        c,
+                        'Agree to continue',
+                        'Please review and accept the Terms of Service and Privacy Policy.',
+                      );
+                      return;
+                    }
+                    store.login();
+                  }, primary: true),
+                ),
                 const SizedBox(height: 12),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Checkbox(
-                      value: accepted,
-                      onChanged: (v) => setState(() => accepted = v ?? false),
+                    Semantics(
+                      label: tr(
+                        'I am 18 or older and agree to the Terms of Service and Privacy Policy.',
+                      ),
+                      checked: accepted,
+                      child: InkWell(
+                        key: const ValueKey('accept-terms'),
+                        onTap: () => setState(() => accepted = !accepted),
+                        child: SizedBox(
+                          width: 48,
+                          height: 48,
+                          child: Center(
+                            child: controlArtwork(accepted ? 1 : 2, size: 28),
+                          ),
+                        ),
+                      ),
                     ),
                     Expanded(
                       child: Wrap(
@@ -420,15 +601,24 @@ class _ShellState extends State<Shell> {
                     child: InkWell(
                       onTap: () => setState(() => tab = i),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 2,
+                          vertical: 6,
+                        ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(
+                            AnimatedContainer(
+                              duration: MediaQuery.of(c).disableAnimations
+                                  ? Duration.zero
+                                  : const Duration(milliseconds: 180),
+                              curve: Curves.easeOut,
                               width: 48,
                               height: 32,
                               decoration: BoxDecoration(
-                                color: i == tab ? const Color(0xff4a1c62) : Colors.transparent,
+                                color: i == tab
+                                    ? const Color(0xff4a1c62)
+                                    : Colors.transparent,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               alignment: Alignment.center,
@@ -442,8 +632,12 @@ class _ShellState extends State<Shell> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  color: i == tab ? const Color(0xffffb0de) : muted,
-                                  fontWeight: i == tab ? FontWeight.w700 : FontWeight.w500,
+                                  color: i == tab
+                                      ? const Color(0xffffb0de)
+                                      : muted,
+                                  fontWeight: i == tab
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
                                   fontSize: 10,
                                 ),
                               ),
@@ -463,6 +657,111 @@ class _ShellState extends State<Shell> {
   );
 }
 
+Widget discoveryIconButton(
+  String label,
+  int artwork,
+  VoidCallback onTap, {
+  bool primary = false,
+  Color? background,
+}) => Tooltip(
+  message: tr(label),
+  child: Semantics(
+    button: true,
+    label: tr(label),
+    child: Material(
+      color: primary ? pink : (background ?? Colors.transparent),
+      borderRadius: BorderRadius.circular(10),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: onTap,
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: Center(child: discoveryArtwork(artwork)),
+        ),
+      ),
+    ),
+  ),
+);
+
+class DiscoverySearchDialog extends StatefulWidget {
+  const DiscoverySearchDialog({required this.initialQuery, super.key});
+  final String initialQuery;
+  @override
+  State<DiscoverySearchDialog> createState() => _DiscoverySearchDialogState();
+}
+
+class _DiscoverySearchDialogState extends State<DiscoverySearchDialog> {
+  late final TextEditingController field;
+  @override
+  void initState() {
+    super.initState();
+    field = TextEditingController(text: widget.initialQuery);
+  }
+
+  @override
+  void dispose() {
+    field.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext c) => Dialog(
+    child: SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              discoveryArtwork(0, size: 36),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: TText(
+                  'Find someone',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                ),
+              ),
+              discoveryIconButton('Close search', 4, () => Navigator.pop(c)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const TText(
+            'Search the community by display name.',
+            style: TextStyle(color: muted, fontSize: 12),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: field,
+            autofocus: true,
+            textInputAction: TextInputAction.search,
+            onSubmitted: (_) => Navigator.pop(c, field.text.trim()),
+            decoration: InputDecoration(hintText: tr('Type a name')),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              TextButton(
+                onPressed: () => Navigator.pop(c, ''),
+                child: const TText('Reset'),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: action(
+                  'Show results',
+                  () => Navigator.pop(c, field.text.trim()),
+                  primary: true,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 class Discover extends StatefulWidget {
   const Discover({super.key});
   @override
@@ -471,6 +770,25 @@ class Discover extends StatefulWidget {
 
 class _DiscoverState extends State<Discover> {
   String category = 'All', region = 'Global', query = '';
+  static const regions = [
+    'Global',
+    'Europe',
+    'Asia',
+    'Latin',
+    'India',
+    'MENA',
+    'Africa',
+    'North America',
+    'Oceania',
+  ];
+  Future<void> searchPeople() async {
+    final result = await showDialog<String>(
+      context: context,
+      builder: (_) => DiscoverySearchDialog(initialQuery: query),
+    );
+    if (mounted && result != null) setState(() => query = result);
+  }
+
   Future<void> locate() async {
     try {
       if (!await Geolocator.isLocationServiceEnabled()) {
@@ -611,83 +929,162 @@ class _DiscoverState extends State<Discover> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 4),
+          padding: const EdgeInsets.fromLTRB(6, 4, 6, 0),
           child: Row(
             children: [
-              Expanded(child: header('Discover')),
-              TextButton(
-                onPressed: () => createMenu(c),
-                child: const TText('Create'),
+              Expanded(
+                child: Row(
+                  children: [
+                    for (final t in ['All', 'Live', 'New', 'Follow'])
+                      Expanded(
+                        child: Semantics(
+                          selected: category == t,
+                          child: SizedBox(
+                            height: 44,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Positioned.fill(
+                                  child: TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      foregroundColor: category == t
+                                          ? Colors.white
+                                          : muted,
+                                      padding: EdgeInsets.zero,
+                                      minimumSize: const Size(0, 44),
+                                    ),
+                                    onPressed: () =>
+                                        setState(() => category = t),
+                                    child: TText(
+                                      t,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: category == t
+                                            ? FontWeight.w700
+                                            : FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                if (category == t)
+                                  IgnorePointer(
+                                    child: Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: Container(
+                                        width: 21,
+                                        height: 3,
+                                        decoration: BoxDecoration(
+                                          color: pink,
+                                          borderRadius: BorderRadius.circular(
+                                            2,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              TextButton(
-                onPressed: locate,
-                child: const TText('Use my region'),
+              discoveryIconButton(
+                'Search people',
+                0,
+                searchPeople,
+                background: query.isEmpty ? null : panel2,
               ),
-              TextButton(
-                onPressed: () => open(c, const Boutique()),
-                child: const TText('Boutique'),
+              discoveryIconButton(
+                'Boutique',
+                1,
+                () => open(c, const Boutique()),
               ),
-              const TText('Example profiles', style: TextStyle(color: muted)),
+              discoveryIconButton(
+                'Create',
+                2,
+                () => createMenu(c),
+                primary: true,
+              ),
             ],
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          child: TextField(
-            onChanged: (v) => setState(() => query = v),
-            decoration: const InputDecoration(
-              hintText: 'Search people',
-              filled: true,
-              fillColor: panel,
-              border: OutlineInputBorder(borderSide: BorderSide.none),
-            ),
-          ),
-        ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.fromLTRB(7, 2, 6, 0),
           child: Row(
             children: [
-              for (final t in ['All', 'Live', 'Follow', 'New'])
-                Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: ChoiceChip(
-                    label: TText(t),
-                    selected: category == t,
-                    onSelected: (_) => setState(() => category = t),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      for (final r in regions)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 7),
+                          child: Semantics(
+                            selected: region == r,
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: region == r
+                                    ? pink.withValues(alpha: .30)
+                                    : Colors.white.withValues(alpha: .07),
+                                foregroundColor: region == r
+                                    ? Colors.white
+                                    : const Color(0xffd2c6d9),
+                                minimumSize: const Size(0, 44),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  side: region == r
+                                      ? const BorderSide(color: pink, width: .8)
+                                      : BorderSide.none,
+                                ),
+                              ),
+                              onPressed: () => setState(() => region = r),
+                              child: TText(
+                                r,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
-              const SizedBox(width: 8),
-              DropdownButton<String>(
-                value: region,
-                items:
-                    [
-                          'Global',
-                          'North America',
-                          'Europe',
-                          'Asia',
-                          'India',
-                          'Latin',
-                          'MENA',
-                          'Africa',
-                          'Oceania',
-                        ]
-                        .map((e) => DropdownMenuItem(value: e, child: TText(e)))
-                        .toList(),
-                onChanged: (v) => setState(() => region = v ?? 'Global'),
+              ),
+              const SizedBox(width: 6),
+              discoveryIconButton(
+                'Use my region',
+                3,
+                locate,
+                background: const Color(0xff7029f2).withValues(alpha: .48),
               ),
             ],
           ),
         ),
+        const Padding(
+          padding: EdgeInsets.fromLTRB(10, 2, 10, 4),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: TText(
+              'Example profiles',
+              style: TextStyle(color: muted, fontSize: 11),
+            ),
+          ),
+        ),
         Expanded(
           child: members.isEmpty
-              ? const Center(child: TText('No profiles found'))
+              ? emptyState('No profiles found', artwork: 1)
               : LayoutBuilder(
                   builder: (c, box) => GridView.builder(
                     padding: const EdgeInsets.all(6),
@@ -700,12 +1097,12 @@ class _DiscoverState extends State<Discover> {
                     itemCount: members.length,
                     itemBuilder: (c, i) {
                       final m = members[i];
-                      return GestureDetector(
+                      return TotiPressable(
                         onTap: () => m.live
                             ? open(c, LiveRoom(m))
                             : open(c, MemberPage(m)),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(16),
                           child: Stack(
                             fit: StackFit.expand,
                             children: [
@@ -720,6 +1117,18 @@ class _DiscoverState extends State<Discover> {
                                       Colors.black87,
                                     ],
                                   ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 10,
+                                right: 10,
+                                child: Container(
+                                  padding: const EdgeInsets.all(7),
+                                  decoration: BoxDecoration(
+                                    color: bg.withValues(alpha: .7),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: actionArtwork(4, size: 18),
                                 ),
                               ),
                               Positioned(
@@ -739,6 +1148,8 @@ class _DiscoverState extends State<Discover> {
                                       ),
                                     TText(
                                       '${m.name}, ${m.age}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
@@ -746,6 +1157,8 @@ class _DiscoverState extends State<Discover> {
                                     ),
                                     TText(
                                       '${m.country}  ${m.region}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(fontSize: 12),
                                     ),
                                   ],
@@ -772,97 +1185,247 @@ class MemberPage extends StatelessWidget {
     animation: store,
     builder: (c, _) {
       final following = store.list('following').contains(member.id);
-      return Screen(
-        member.name,
-        ListView(
-          children: [
-            SizedBox(
-              height: 440,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  photo(member.image),
-                  const DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.center,
-                        end: Alignment.bottomCenter,
-                        colors: [Colors.transparent, Colors.black87],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 18,
-                    bottom: 18,
-                    child: TText(
-                      '${member.name}, ${member.age}\n${member.country}  ${member.region}',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  header('About'),
-                  const SizedBox(height: 8),
-                  TText(member.bio),
-                  const SizedBox(height: 20),
-                  header('Interests'),
-                  Wrap(
-                    spacing: 8,
-                    children: member.interests
-                        .map((e) => Chip(label: TText(e)))
-                        .toList(),
-                  ),
-                  const SizedBox(height: 12),
-                  TText(member.doorway, style: const TextStyle(color: muted)),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: action(
-                          following ? 'Following' : 'Follow',
-                          () => store.toggle('following', member.id),
-                          primary: !following,
+      return Scaffold(
+        body: SafeArea(
+          bottom: false,
+          child: ListView(
+            children: [
+              SizedBox(
+                height: (MediaQuery.sizeOf(c).height * .51).clamp(300.0, 460.0),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    photo(member.image),
+                    const DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color(0x660b0417),
+                            Colors.transparent,
+                            Color(0xe6000010),
+                          ],
+                          stops: [0, .48, 1],
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: action('Message', () {
-                          if (!store.mutual(member)) {
-                            notice(
-                              c,
-                              'Mutual follow required',
-                              'You and ${member.name} must both follow each other before messaging.',
-                            );
-                            return;
-                          }
-                          open(c, Conversation(member));
-                        }),
+                    ),
+                    Positioned(
+                      top: 12,
+                      left: 14,
+                      child: memberIconButton(
+                        label: 'Back',
+                        artwork: 0,
+                        onTap: () => Navigator.maybePop(c),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  action(
-                    'Report or block',
-                    () => safety(c, 'profile:${member.id}', member),
-                  ),
-                ],
+                    ),
+                    Positioned(
+                      top: 12,
+                      right: 14,
+                      child: memberIconButton(
+                        label: 'Report or block',
+                        artwork: 4,
+                        onTap: () => safety(c, 'profile:${member.id}', member),
+                      ),
+                    ),
+                    Positioned(
+                      left: 20,
+                      right: 20,
+                      bottom: 22,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TText(
+                            '${member.name}, ${member.age}',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 27,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          TText(
+                            '${member.country}  ${member.region}',
+                            style: const TextStyle(
+                              color: Color(0xffe1d9e8),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 22, 20, 26),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const TText(
+                      'About',
+                      style: TextStyle(
+                        color: Color(0xffc6b4d4),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: .8,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TText(
+                      member.bio,
+                      style: const TextStyle(fontSize: 15, height: 1.45),
+                    ),
+                    const SizedBox(height: 24),
+                    const TText(
+                      'Interests',
+                      style: TextStyle(
+                        color: Color(0xffc6b4d4),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: .8,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: member.interests
+                          .map(
+                            (interest) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 13,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xff251444),
+                                borderRadius: BorderRadius.circular(22),
+                                border: Border.all(
+                                  color: const Color(0xff49305e),
+                                ),
+                              ),
+                              child: TText(
+                                interest,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                    const SizedBox(height: 20),
+                    TText(
+                      member.doorway,
+                      style: const TextStyle(color: muted, height: 1.4),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        bottomNavigationBar: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: memberActionButton(
+                    label: following ? 'Following' : 'Follow',
+                    artwork: following ? 2 : 1,
+                    primary: !following,
+                    onTap: () => store.toggle('following', member.id),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: memberActionButton(
+                    label: 'Message',
+                    artwork: 3,
+                    onTap: () {
+                      if (!store.mutual(member)) {
+                        notice(
+                          c,
+                          'Mutual follow required',
+                          'You and ${member.name} must both follow each other before messaging.',
+                        );
+                        return;
+                      }
+                      open(c, Conversation(member));
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       );
     },
   );
 }
+
+Widget memberIconButton({
+  required String label,
+  required int artwork,
+  required VoidCallback onTap,
+}) => Tooltip(
+  message: tr(label),
+  child: Semantics(
+    button: true,
+    label: tr(label),
+    child: Material(
+      color: const Color(0xff1b102c).withValues(alpha: .78),
+      borderRadius: BorderRadius.circular(15),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(15),
+        onTap: onTap,
+        child: SizedBox(
+          width: 46,
+          height: 46,
+          child: Center(child: memberActionArtwork(artwork, size: 24)),
+        ),
+      ),
+    ),
+  ),
+);
+
+Widget memberActionButton({
+  required String label,
+  required int artwork,
+  required VoidCallback onTap,
+  bool primary = false,
+}) => TextButton(
+  style: TextButton.styleFrom(
+    backgroundColor: primary ? pink : const Color(0xff2c164d),
+    foregroundColor: Colors.white,
+    minimumSize: const Size(48, 54),
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+  ),
+  onPressed: onTap,
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      memberActionArtwork(artwork, size: 25),
+      const SizedBox(width: 7),
+      Flexible(
+        child: TText(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+        ),
+      ),
+    ],
+  ),
+);
 
 void safety(BuildContext c, String id, Member? member) {
   showModalBottomSheet(
@@ -872,6 +1435,7 @@ void safety(BuildContext c, String id, Member? member) {
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
+            leading: utilityArtwork(2),
             title: const TText('Report content'),
             onTap: () {
               Navigator.pop(ctx);
@@ -880,6 +1444,7 @@ void safety(BuildContext c, String id, Member? member) {
           ),
           if (member != null)
             ListTile(
+              leading: utilityArtwork(2),
               title: TText('Block ${member.name}'),
               onTap: () {
                 Navigator.pop(ctx);
@@ -888,7 +1453,7 @@ void safety(BuildContext c, String id, Member? member) {
                   builder: (d) => AlertDialog(
                     title: TText('Block ${member.name}?'),
                     content: const TText(
-                      'Their profile and activity will be hidden on this device.',
+                      'Their profile and activity will be hidden from your view.',
                     ),
                     actions: [
                       TextButton(
@@ -941,11 +1506,59 @@ void report(BuildContext c, String id, Member? member) {
                 notice(
                   c,
                   'Report recorded',
-                  'The report is stored on this device. Reported videos and moments are hidden here.',
+                  'This report is saved for your reference; no moderation service is connected. Reported content is hidden from your view.',
                 );
               },
             ),
         ],
+      ),
+    ),
+  );
+}
+
+class ReelAction extends StatelessWidget {
+  const ReelAction({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+    this.selected = false,
+    super.key,
+  });
+  final String label;
+  final int icon;
+  final VoidCallback onTap;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) => Tooltip(
+    message: tr(label),
+    child: Semantics(
+      button: true,
+      label: tr(label),
+      selected: selected,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: MediaQuery.of(context).disableAnimations
+                ? Duration.zero
+                : const Duration(milliseconds: 180),
+            curve: Curves.easeOut,
+            width: 48,
+            height: 48,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: selected
+                  ? const Color(0xff642253).withValues(alpha: .92)
+                  : const Color(0xff170b2c).withValues(alpha: .82),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withValues(alpha: .18)),
+            ),
+            child: reelArtwork(icon),
+          ),
+        ),
       ),
     ),
   );
@@ -999,11 +1612,21 @@ class _ReelsState extends State<Reels> with WidgetsBindingObserver, RouteAware {
     }
   }
 
-  List<dynamic> get reels => (store.data['reels'] as List).where((r) {
-    final i = (store.data['reels'] as List).indexOf(r);
-    return !store.list('blocked').contains('member-$i') &&
-        !store.records('reports').any((x) => x['id'] == 'reel:${r['video']}');
-  }).toList();
+  List<dynamic> get reels {
+    final source = store.data['reels'] as List;
+    final ordered = List<dynamic>.of(source);
+    if (ordered.length >= 3) {
+      final first = ordered[0];
+      ordered[0] = ordered[2];
+      ordered[2] = first;
+    }
+    return ordered.where((r) {
+      final i = source.indexOf(r);
+      return !store.list('blocked').contains('member-$i') &&
+          !store.records('reports').any((x) => x['id'] == 'reel:${r['video']}');
+    }).toList();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -1070,7 +1693,7 @@ class _ReelsState extends State<Reels> with WidgetsBindingObserver, RouteAware {
 
   @override
   Widget build(BuildContext c) {
-    if (reels.isEmpty) return const Center(child: TText('No videos available'));
+    if (reels.isEmpty) return emptyState('No videos available', artwork: 1);
     return PageView.builder(
       scrollDirection: Axis.vertical,
       itemCount: reels.length,
@@ -1083,84 +1706,173 @@ class _ReelsState extends State<Reels> with WidgetsBindingObserver, RouteAware {
         final r = reels[i];
         final original = (store.data['reels'] as List).indexOf(r);
         final m = store.members[original];
+        final videoCover = r['thumbnail'] as String;
         final id = 'reel:${r['video']}';
         final liked = store.list('likes').contains(id);
         return Stack(
           fit: StackFit.expand,
           children: [
             if (i == index && player?.value.isInitialized == true)
-              GestureDetector(
-                onTap: () {
-                  setState(() => paused = !paused);
-                  paused ? player?.pause() : player?.play();
-                },
-                child: FittedBox(
-                  fit: BoxFit.cover,
-                  clipBehavior: Clip.hardEdge,
-                  child: SizedBox(
-                    width: player!.value.size.width,
-                    height: player!.value.size.height,
-                    child: VideoPlayer(player!),
+              Semantics(
+                button: true,
+                label: tr(paused ? 'Resume video' : 'Pause video'),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    setState(() => paused = !paused);
+                    paused ? player?.pause() : player?.play();
+                  },
+                  child: FittedBox(
+                    fit: BoxFit.cover,
+                    clipBehavior: Clip.hardEdge,
+                    child: SizedBox(
+                      width: player!.value.size.width,
+                      height: player!.value.size.height,
+                      child: VideoPlayer(player!),
+                    ),
                   ),
                 ),
               )
             else
-              photo(m.image),
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.center,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black87],
+              photo(videoCover),
+            const IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.center,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.transparent, Colors.black87],
+                  ),
                 ),
               ),
             ),
+            if (i == index && paused)
+              Center(
+                child: IgnorePointer(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: bg.withValues(alpha: .8),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        reelArtwork(4, size: 25),
+                        const SizedBox(width: 8),
+                        const TText(
+                          'Paused · Tap to resume',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             Positioned(
-              top: 8,
-              right: 8,
-              child: TextButton(
-                onPressed: () => safety(c, id, m),
-                child: const TText('Report'),
+              top: 12,
+              right: 14,
+              child: liveControl(
+                'Report',
+                reelArtwork(0, size: 23),
+                () => safety(c, id, m),
               ),
             ),
             Positioned(
               left: 18,
-              right: 90,
-              bottom: 26,
+              right: 100,
+              bottom: 24,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 0),
+                      alignment: Alignment.centerLeft,
+                    ),
                     onPressed: () => open(c, MemberPage(m)),
-                    child: TText(
-                      '@${m.name.toLowerCase()}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 19,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: TText(
+                            '@${m.name.toLowerCase()}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              shadows: [
+                                Shadow(color: Colors.black87, blurRadius: 5),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        actionArtwork(4, size: 17),
+                      ],
                     ),
                   ),
-                  TText(r['caption']),
+                  TText(
+                    r['caption'],
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      height: 1.4,
+                      shadows: [Shadow(color: Colors.black87, blurRadius: 5)],
+                    ),
+                  ),
                 ],
               ),
             ),
             Positioned(
-              right: 8,
-              bottom: 20,
+              right: 10,
+              bottom: 18,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  GestureDetector(
-                    onTap: () => open(c, MemberPage(m)),
-                    child: avatar(m.image),
+                  Semantics(
+                    button: true,
+                    label: tr('View profile'),
+                    child: TotiPressable(
+                      onTap: () => open(c, MemberPage(m)),
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: .9),
+                            width: 2,
+                          ),
+                        ),
+                        child: avatar(m.image, size: 46),
+                      ),
+                    ),
                   ),
-                  TextButton(
-                    onPressed: () => store.toggle('likes', id),
-                    child: TText(liked ? 'Liked' : 'Like'),
+                  const SizedBox(height: 12),
+                  ReelAction(
+                    label: liked ? 'Liked' : 'Like',
+                    icon: liked ? 2 : 1,
+                    selected: liked,
+                    onTap: () => store.toggle('likes', id),
                   ),
-                  TextButton(
-                    onPressed: () => open(c, Comments(id)),
-                    child: const TText('Comments'),
+                  const SizedBox(height: 8),
+                  ReelAction(
+                    label: 'Comments',
+                    icon: 3,
+                    onTap: () => showComments(c, id),
                   ),
                 ],
               ),
@@ -1172,6 +1884,23 @@ class _ReelsState extends State<Reels> with WidgetsBindingObserver, RouteAware {
   }
 }
 
+void showComments(BuildContext context, String id) {
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) {
+      final media = MediaQuery.of(context);
+      final available =
+          media.size.height - media.padding.top - media.viewInsets.bottom;
+      return Padding(
+        padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
+        child: SizedBox(height: available * .76, child: Comments(id)),
+      );
+    },
+  );
+}
+
 class Comments extends StatefulWidget {
   final String id;
   const Comments(this.id, {super.key});
@@ -1181,6 +1910,7 @@ class Comments extends StatefulWidget {
 
 class _CommentsState extends State<Comments> {
   final field = TextEditingController();
+  final scroll = ScrollController();
   void refresh() {
     if (mounted) setState(() {});
   }
@@ -1195,6 +1925,7 @@ class _CommentsState extends State<Comments> {
   void dispose() {
     store.removeListener(refresh);
     field.dispose();
+    scroll.dispose();
     super.dispose();
   }
 
@@ -1213,58 +1944,181 @@ class _CommentsState extends State<Comments> {
         .toList()
         .reversed
         .toList();
-    return Screen(
-      'Comments',
-      Column(
-        children: [
-          Expanded(
-            child: comments.isEmpty
-                ? const Center(child: TText('No comments yet'))
-                : ListView(
-                    children: [
-                      for (final e in comments)
-                        ListTile(
-                          title: TText(e['author']),
-                          subtitle: TText(e['text']),
-                          trailing: TextButton(
-                            onPressed: () {
-                              final member = store.members
-                                  .where((m) => m.id == e['member'])
-                                  .firstOrNull;
-                              safety(
-                                c,
-                                'comment:${e['id'] ?? e['text']}',
-                                member,
-                              );
-                            },
-                            child: const TText('Report'),
-                          ),
-                        ),
-                    ],
+    return Material(
+      color: const Color(0xff130a29),
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+      clipBehavior: Clip.antiAlias,
+      child: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 16, 12, 10),
+              child: Row(
+                children: [
+                  const TText(
+                    'Comments',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
                   ),
-          ),
-          composer(field, () {
-            final t = field.text.trim();
-            if (!allowed(t)) {
-              notice(
-                c,
-                'Comment not sent',
-                'Please enter a clear, safe message.',
-              );
-              return;
-            }
-            store.addRecord('comments', {
-              'content': widget.id,
-              'id': DateTime.now().microsecondsSinceEpoch.toString(),
-              'author': store.get('nickname', 'Nani Kohli'),
-              'text': t,
-            });
-            field.clear();
-            setState(() {});
-          }),
-        ],
+                  const SizedBox(width: 8),
+                  TText(
+                    '${comments.length}',
+                    style: const TextStyle(
+                      color: Color(0xffff9bd8),
+                      fontSize: 13,
+                    ),
+                  ),
+                  const Spacer(),
+                  discoveryIconButton('Close', 4, () => Navigator.pop(c)),
+                ],
+              ),
+            ),
+            Expanded(
+              child: comments.isEmpty
+                  ? emptyState('No comments yet', artwork: 2)
+                  : ListView.builder(
+                      controller: scroll,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 4,
+                      ),
+                      itemCount: comments.length,
+                      itemBuilder: (context, index) {
+                        final e = comments[index];
+                        final member = store.members
+                            .where((m) => m.id == e['member'])
+                            .firstOrNull;
+                        final isMine = e['member'] == null;
+                        final author = e['author'] as String? ?? '';
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 11),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (member != null)
+                                avatar(member.image, size: 42)
+                              else if (isMine)
+                                myAvatar(size: 42)
+                              else
+                                Container(
+                                  width: 42,
+                                  height: 42,
+                                  alignment: Alignment.center,
+                                  decoration: const BoxDecoration(
+                                    color: panel2,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: TText(
+                                    author.isNotEmpty
+                                        ? author.characters.first.toUpperCase()
+                                        : '?',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TText(
+                                      author,
+                                      style: const TextStyle(
+                                        color: Color(0xffc9b8d5),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    TText(
+                                      e['text'] as String? ?? '',
+                                      style: const TextStyle(
+                                        color: Color(0xfff4ecf6),
+                                        fontSize: 14,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              memberIconButton(
+                                label: 'Report',
+                                artwork: 4,
+                                onTap: () => safety(
+                                  c,
+                                  'comment:${e['id'] ?? e['text']}',
+                                  member,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
+              child: Row(
+                children: [
+                  myAvatar(size: 36),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
+                      controller: field,
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => send(),
+                      decoration: InputDecoration(
+                        hintText: tr('Write a message'),
+                        filled: true,
+                        fillColor: panel2,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 11,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: pink,
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: send,
+                    child: const TText('Send'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  void send() {
+    final t = field.text.trim();
+    if (!allowed(t)) {
+      notice(
+        context,
+        'Comment not sent',
+        'Please enter a clear, safe message.',
+      );
+      return;
+    }
+    store.addRecord('comments', {
+      'content': widget.id,
+      'id': DateTime.now().microsecondsSinceEpoch.toString(),
+      'author': store.get('nickname', 'Nani Kohli'),
+      'text': t,
+    });
+    field.clear();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !scroll.hasClients) return;
+      scroll.jumpTo(scroll.position.maxScrollExtent);
+    });
   }
 }
 
@@ -1279,11 +2133,18 @@ Widget composer(TextEditingController field, VoidCallback send) => Padding(
             hintText: 'Write a message',
             filled: true,
             fillColor: panel,
-            border: OutlineInputBorder(borderSide: BorderSide.none),
           ),
         ),
       ),
-      TextButton(onPressed: send, child: const TText('Send')),
+      const SizedBox(width: 8),
+      TextButton(
+        style: TextButton.styleFrom(
+          backgroundColor: pink,
+          foregroundColor: Colors.white,
+        ),
+        onPressed: send,
+        child: const TText('Send'),
+      ),
     ],
   ),
 );
@@ -1294,7 +2155,7 @@ const roomSeeds = <Map<String, dynamic>>[
     'title': 'Glow After Dark',
     'summary': 'Music · stories · easy company',
     'host': '0',
-    'cover': 'riverside-wheel-view.jpg',
+    'cover': 'room-stills/night-skyline-chat.jpg',
     'tag': 'Featured',
     'audience': 'English',
     'guests': [0, 3, 5],
@@ -1304,7 +2165,7 @@ const roomSeeds = <Map<String, dynamic>>[
     'title': 'City Pop Lounge',
     'summary': 'Live playlist',
     'host': '6',
-    'cover': 'yellow-cab-corner.jpg',
+    'cover': 'room-stills/street-style-live.jpg',
     'tag': 'Music',
     'audience': 'Spain',
     'guests': [6, 7, 9],
@@ -1314,7 +2175,7 @@ const roomSeeds = <Map<String, dynamic>>[
     'title': 'Coffee & Good News',
     'summary': 'English room',
     'host': '10',
-    'cover': 'waterfront-blue-sky.jpg',
+    'cover': 'room-stills/rooftop-food-live.jpg',
     'tag': 'Conversation',
     'audience': 'English',
     'guests': [10, 11, 15],
@@ -1324,7 +2185,7 @@ const roomSeeds = <Map<String, dynamic>>[
     'title': 'Game Night',
     'summary': 'Friendly challenges',
     'host': '17',
-    'cover': 'metro-bandana.jpg',
+    'cover': 'room-stills/city-dance-corner.jpg',
     'tag': 'Games',
     'audience': 'India',
     'guests': [17, 18, 19],
@@ -1334,7 +2195,7 @@ const roomSeeds = <Map<String, dynamic>>[
     'title': 'Travel Postcards',
     'summary': 'Share your favorite view',
     'host': '21',
-    'cover': 'sunhat-lakeside.jpg',
+    'cover': 'room-stills/friends-city-walk.jpg',
     'tag': 'Travel',
     'audience': 'Turkey',
     'guests': [21, 22, 23],
@@ -1344,7 +2205,7 @@ const roomSeeds = <Map<String, dynamic>>[
     'title': 'Late Night Cinema',
     'summary': "Tonight's watch list",
     'host': '27',
-    'cover': 'car-window-portrait.webp',
+    'cover': 'room-stills/courtyard-dance-live.jpg',
     'tag': 'Cinema',
     'audience': 'China',
     'guests': [27, 28, 29],
@@ -1357,8 +2218,42 @@ class Rooms extends StatefulWidget {
   State<Rooms> createState() => _RoomsState();
 }
 
+Widget roomToolbarAction(
+  String label,
+  int artwork,
+  VoidCallback onTap, {
+  bool primary = false,
+}) => Tooltip(
+  message: tr(label),
+  child: Semantics(
+    button: true,
+    label: tr(label),
+    child: Material(
+      color: primary ? pink : panel2,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
+        child: SizedBox(
+          width: 48,
+          height: 48,
+          child: Center(child: roomToolbarArtwork(artwork)),
+        ),
+      ),
+    ),
+  ),
+);
+
 class _RoomsState extends State<Rooms> {
   String query = '', tab = 'Party', audience = 'All';
+  static const audiences = [
+    'All',
+    'English',
+    'Spain',
+    'India',
+    'Turkey',
+    'China',
+  ];
   @override
   Widget build(BuildContext c) {
     var rooms = [...store.records('rooms'), ...roomSeeds].where((r) {
@@ -1376,75 +2271,141 @@ class _RoomsState extends State<Rooms> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                for (final t in ['Party', 'Follow', 'Recent'])
-                  TextButton(
-                    onPressed: () => setState(() => tab = t),
-                    child: TText(
-                      t,
-                      style: TextStyle(
-                        color: tab == t ? Colors.white : muted,
-                        fontWeight: tab == t
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                      ),
-                    ),
-                  ),
-                const SizedBox(width: 8),
-                TextButton(
-                  onPressed: () => open(c, const Boutique()),
-                  child: const TText('Store'),
-                ),
-                TextButton(
-                  onPressed: () => open(c, const RoomEditor()),
-                  child: const TText('Create'),
-                ),
-              ],
-            ),
-          ),
-        ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
           child: Row(
             children: [
-              for (final a in [
-                'All',
-                'English',
-                'Spain',
-                'India',
-                'Turkey',
-                'China',
-              ])
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: ChoiceChip(
-                    label: TText(a),
-                    selected: audience == a,
-                    onSelected: (_) => setState(() => audience = a),
+              Expanded(
+                child: Container(
+                  height: 48,
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: panel,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Row(
+                    children: [
+                      for (final t in ['Party', 'Follow', 'Recent'])
+                        Expanded(
+                          child: Semantics(
+                            selected: tab == t,
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: tab == t
+                                    ? const Color(0xff593286)
+                                    : Colors.transparent,
+                                foregroundColor: tab == t
+                                    ? Colors.white
+                                    : const Color(0xffc5b7d0),
+                                minimumSize: const Size(0, 40),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 2,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(11),
+                                ),
+                              ),
+                              onPressed: () => setState(() => tab = t),
+                              child: TText(
+                                t,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
+              ),
+              const SizedBox(width: 8),
+              roomToolbarAction('Store', 0, () => open(c, const Boutique())),
+              const SizedBox(width: 6),
+              roomToolbarAction(
+                'Create',
+                1,
+                () => open(c, const RoomEditor()),
+                primary: true,
+              ),
             ],
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(14, 4, 14, 8),
-          child: TextField(
-            onChanged: (v) => setState(() => query = v),
-            decoration: InputDecoration(
-              hintText: tr('Search rooms'),
-              filled: true,
-              fillColor: panel,
-              border: const OutlineInputBorder(borderSide: BorderSide.none),
-            ),
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  onChanged: (v) => setState(() => query = v),
+                  decoration: InputDecoration(
+                    hintText: tr('Search rooms'),
+                    filled: true,
+                    fillColor: panel,
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: ExcludeSemantics(
+                        child: Image.asset(
+                          'assets/art/toti-search.png',
+                          width: 20,
+                          height: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 116,
+                child: Container(
+                  height: 52,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    color: panel,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Tooltip(
+                    message: tr('Room filter'),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: audience,
+                        isExpanded: true,
+                        menuWidth: 180,
+                        dropdownColor: panel2,
+                        borderRadius: BorderRadius.circular(14),
+                        icon: roomToolbarArtwork(2, size: 20),
+                        selectedItemBuilder: (context) => [
+                          for (final a in audiences)
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: TText(
+                                a,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                        ],
+                        items: [
+                          for (final a in audiences)
+                            DropdownMenuItem(value: a, child: TText(a)),
+                        ],
+                        onChanged: (value) =>
+                            setState(() => audience = value ?? 'All'),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         Expanded(
           child: rooms.isEmpty
-              ? const Center(child: TText('No rooms found'))
+              ? emptyState('No rooms found')
               : LayoutBuilder(
                   builder: (c, box) {
                     final columns = box.maxWidth >= 700 ? 3 : 2;
@@ -1484,10 +2445,10 @@ class _RoomsState extends State<Rooms> {
     return SizedBox(
       width: width,
       height: height,
-      child: InkWell(
-        onTap: () => open(c, RoomInvitation(room)),
+      child: TotiPressable(
+        onTap: () => open(c, RoomPage(room)),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(16),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -1510,20 +2471,40 @@ class _RoomsState extends State<Rooms> {
               Positioned(
                 top: 10,
                 right: 10,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: pink,
-                    borderRadius: BorderRadius.circular(9),
-                  ),
-                  child: TText(
-                    room['tag'] ?? 'Room',
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: width - 20),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: pink,
+                      borderRadius: BorderRadius.circular(9),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ExcludeSemantics(
+                          child: spriteArtwork(
+                            'assets/art/toti-navigation-icons.png',
+                            2,
+                            size: 17,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: TText(
+                            room['tag'] ?? 'Room',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -1581,70 +2562,6 @@ class _RoomsState extends State<Rooms> {
       ),
     );
   }
-}
-
-class RoomInvitation extends StatelessWidget {
-  final Map<String, dynamic> room;
-  const RoomInvitation(this.room, {super.key});
-  @override
-  Widget build(BuildContext c) => Screen(
-    room['title'],
-    ListView(
-      children: [
-        SizedBox(
-          height: 320,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              if (room['cover'] != null)
-                photo(room['cover'])
-              else
-                Image.asset(
-                  'assets/art/presence-constellation-field.png',
-                  fit: BoxFit.cover,
-                ),
-              const DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.center,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, bg],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 20,
-                right: 20,
-                bottom: 20,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [header(room['title']), TText(room['summary'])],
-                ),
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const TText(
-                'A space to explore a shared interest. This room is an example; messages remain on your device.',
-                style: TextStyle(fontSize: 15, color: muted),
-              ),
-              const SizedBox(height: 24),
-              action(
-                'Enter room',
-                () => open(c, RoomPage(room)),
-                primary: true,
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
 }
 
 class RoomEditor extends StatefulWidget {
@@ -1738,6 +2655,61 @@ class RoomPage extends StatefulWidget {
   State<RoomPage> createState() => _RoomPageState();
 }
 
+class VoiceRoomControl extends StatelessWidget {
+  const VoiceRoomControl({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+    this.active = false,
+    super.key,
+  });
+  final String label;
+  final Widget icon;
+  final VoidCallback onTap;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: Colors.transparent,
+    child: InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 46,
+              height: 46,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: active
+                    ? const Color(0xff7c2567)
+                    : const Color(0xff28123e),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: icon,
+            ),
+            const SizedBox(height: 5),
+            TText(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 class _RoomPageState extends State<RoomPage>
     with WidgetsBindingObserver, RouteAware {
   @override
@@ -1756,6 +2728,7 @@ class _RoomPageState extends State<RoomPage>
   final recorder = AudioRecorder();
   StreamSubscription<dynamic>? audioStream;
   bool onStage = false, micActive = false, micBusy = false;
+  int mySeat = 7;
   int micGeneration = 0;
   @override
   void initState() {
@@ -1773,7 +2746,7 @@ class _RoomPageState extends State<RoomPage>
     if (mounted) setState(() => micActive = false);
   }
 
-  Future<void> toggleMic() async {
+  Future<void> toggleMic({int? requestedSeat}) async {
     if (micBusy) return;
     if (micActive) {
       await stopMic();
@@ -1816,6 +2789,7 @@ class _RoomPageState extends State<RoomPage>
       setState(() {
         onStage = true;
         micActive = true;
+        if (requestedSeat != null) mySeat = requestedSeat;
       });
     } catch (_) {
       if (mounted) {
@@ -1846,104 +2820,361 @@ class _RoomPageState extends State<RoomPage>
     super.dispose();
   }
 
+  Widget stageSeat(
+    BuildContext c,
+    double width, {
+    Member? member,
+    bool host = false,
+    bool mine = false,
+    bool available = false,
+    required int seatIndex,
+  }) {
+    final label =
+        member?.name ??
+        (mine ? store.get('nickname', 'You') as String : 'Open');
+    final VoidCallback? openSeat = member != null
+        ? () => open(c, MemberPage(member))
+        : available
+        ? () {
+            if (onStage) {
+              setState(() => mySeat = seatIndex);
+            } else {
+              toggleMic(requestedSeat: seatIndex);
+            }
+          }
+        : null;
+    return SizedBox(
+      width: width,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Material(
+            color: const Color(0xff3b2051).withValues(alpha: .8),
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: openSeat,
+              customBorder: const CircleBorder(),
+              child: SizedBox(
+                width: 58,
+                height: 58,
+                child: member != null
+                    ? avatar(member.image, size: 58)
+                    : mine
+                    ? myAvatar(size: 58)
+                    : Center(child: utilityArtwork(0, size: 27)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 5),
+          TText(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 2),
+          TText(
+            host
+                ? 'Host'
+                : mine
+                ? (micActive ? 'Mic on' : 'Muted')
+                : member != null
+                ? 'Example'
+                : 'Seat',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Color(0xffd8bfda), fontSize: 10),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext c) {
     final id = 'room:${widget.room['id'] ?? widget.room['title']}';
-    final host = store.members[int.tryParse('${widget.room['host']}') ?? 0];
+    final hostIndex = int.tryParse('${widget.room['host']}') ?? 0;
+    final host = store.members[hostIndex];
+    final guestIndices = (widget.room['guests'] as List? ?? [hostIndex])
+        .whereType<int>()
+        .where(
+          (i) =>
+              i >= 0 &&
+              i < store.members.length &&
+              i != hostIndex &&
+              !store.list('blocked').contains('member-$i'),
+        )
+        .toList();
+    final stageMembers = [
+      host,
+      for (final i in guestIndices) store.members[i],
+    ].take(7).toList();
     final messages = store
         .records('roomMessages')
         .where((e) => e['room'] == id)
         .toList()
         .reversed;
-    return Screen(
-      widget.room['title'],
-      Column(
+
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      body: Stack(
+        fit: StackFit.expand,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: card(
-              Column(
-                children: [
-                  avatar(host.image, size: 80),
-                  const SizedBox(height: 8),
-                  TText(widget.room['summary']),
-                  const SizedBox(height: 8),
-                  const TText(
-                    'Example room · no audio is sent to others',
-                    style: TextStyle(color: muted),
-                  ),
-                  TextButton(
-                    onPressed: () => open(c, MemberPage(host)),
-                    child: TText('Host: ${host.name}'),
-                  ),
-                ],
-              ),
-            ),
+          Image.asset(
+            'assets/art/toti-voice-room-background.png',
+            fit: BoxFit.cover,
           ),
-          Expanded(
-            child: messages.isEmpty
-                ? const Center(child: TText('Say hello to the room'))
-                : ListView(
+          SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+                  child: Row(
                     children: [
-                      for (final e in messages)
-                        ListTile(
-                          title: TText(e['author']),
-                          subtitle: TText(e['text']),
+                      liveControl(
+                        'Back',
+                        controlArtwork(0, size: 22),
+                        () => Navigator.maybePop(c),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TText(
+                              widget.room['title'] as String,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            TText(
+                              widget.room['summary'] as String,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xffdbc9dd),
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
                         ),
+                      ),
+                      const SizedBox(width: 8),
+                      liveControl(
+                        'Report',
+                        reelArtwork(0, size: 23),
+                        () => safety(c, id, host),
+                      ),
                     ],
                   ),
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                TextButton(
-                  onPressed: toggleMic,
-                  child: TText(
-                    micActive
-                        ? 'Mute'
-                        : onStage
-                        ? 'Unmute'
-                        : 'Join stage',
+                ),
+                Expanded(
+                  child: ListView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                    children: [
+                      Material(
+                        color: const Color(0xff251038).withValues(alpha: .82),
+                        borderRadius: BorderRadius.circular(18),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(18),
+                          onTap: () => open(c, MemberPage(host)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              children: [
+                                avatar(host.image, size: 46),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      TText(
+                                        'Host: ${host.name}',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      const TText(
+                                        'Example room · audio and messages are not shared',
+                                        style: TextStyle(
+                                          color: Color(0xffdcc9df),
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                actionArtwork(4, size: 18),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const TText(
+                        'Example seats',
+                        style: TextStyle(
+                          color: Color(0xffe2cee5),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final seatWidth = constraints.maxWidth / 4;
+                          return Wrap(
+                            runSpacing: 16,
+                            children: [
+                              for (var i = 0; i < 8; i++)
+                                stageSeat(
+                                  c,
+                                  seatWidth,
+                                  member: i < stageMembers.length
+                                      ? stageMembers[i]
+                                      : null,
+                                  host: i == 0,
+                                  mine: i == mySeat && onStage,
+                                  available:
+                                      i >= stageMembers.length &&
+                                      !(i == mySeat && onStage),
+                                  seatIndex: i,
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 22),
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: const Color(0xff160a29).withValues(alpha: .72),
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const TText(
+                              'Room chat',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            if (messages.isEmpty)
+                              const TText(
+                                'Say hello to the room',
+                                style: TextStyle(color: Color(0xffcdb9d1)),
+                              )
+                            else
+                              for (final message in messages)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: Wrap(
+                                    children: [
+                                      TText(
+                                        '${message['author']}: ',
+                                        style: const TextStyle(
+                                          color: Color(0xffffaeda),
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      TText(
+                                        activityText(message['text'] as String),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                TextButton(
-                  onPressed: () => showRoomMembers(c, widget.room),
-                  child: const TText('Members'),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: VoiceRoomControl(
+                          label: micActive
+                              ? 'Mute'
+                              : onStage
+                              ? 'Unmute'
+                              : 'Join stage',
+                          icon: utilityArtwork(0, size: 25),
+                          active: micActive,
+                          onTap: () => toggleMic(),
+                        ),
+                      ),
+                      Expanded(
+                        child: VoiceRoomControl(
+                          label: 'Members',
+                          icon: navigationArtwork(2, selected: true),
+                          onTap: () => showRoomMembers(c, widget.room),
+                        ),
+                      ),
+                      Expanded(
+                        child: VoiceRoomControl(
+                          label: 'Gifts',
+                          icon: giftArtwork(4, size: 32),
+                          onTap: () async {
+                            await showGifts(c, id);
+                            if (mounted) setState(() {});
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: VoiceRoomControl(
+                          label: 'Report',
+                          icon: reelArtwork(0, size: 24),
+                          onTap: () => safety(c, id, host),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                TextButton(
-                  onPressed: () async {
-                    await showGifts(c, id);
-                    if (mounted) setState(() {});
-                  },
-                  child: const TText('Gifts'),
-                ),
-
-                TextButton(
-                  onPressed: () => safety(c, id, host),
-                  child: const TText('Report'),
-                ),
+                composer(field, () {
+                  if (!allowed(field.text)) {
+                    notice(
+                      c,
+                      'Message not sent',
+                      'Please enter a clear, safe message.',
+                    );
+                    return;
+                  }
+                  store.addRecord('roomMessages', {
+                    'room': id,
+                    'author': store.get('nickname', 'Nani Kohli'),
+                    'text': field.text.trim(),
+                  });
+                  field.clear();
+                  setState(() {});
+                }),
               ],
             ),
           ),
-          composer(field, () {
-            if (!allowed(field.text)) {
-              notice(
-                c,
-                'Message not sent',
-                'Please enter a clear, safe message.',
-              );
-              return;
-            }
-            store.addRecord('roomMessages', {
-              'room': id,
-              'author': store.get('nickname', 'Nani Kohli'),
-              'text': field.text.trim(),
-            });
-            field.clear();
-            setState(() {});
-          }),
         ],
       ),
     );
@@ -1959,7 +3190,10 @@ void showRoomMembers(BuildContext context, Map<String, dynamic> room) {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const ListTile(title: TText('Room members')),
+          const ListTile(
+            title: TText('Example members'),
+            subtitle: TText('These profiles are examples.'),
+          ),
           for (final n in guests)
             if (!store.list('blocked').contains(store.members[n as int].id))
               ListTile(
@@ -1976,17 +3210,21 @@ void showRoomMembers(BuildContext context, Map<String, dynamic> room) {
   );
 }
 
-Future<void> showGifts(BuildContext context, String roomId) async {
+Future<String?> showGifts(
+  BuildContext context,
+  String roomId, {
+  bool showReceipt = true,
+}) async {
   const gifts = [
     ['Rose', 25],
     ['Kiss', 60],
     ['Crown', 180],
     ['Rocket', 520],
   ];
-  await showModalBottomSheet<void>(
+  final selected = await showModalBottomSheet<String>(
     context: context,
     builder: (sheet) => SafeArea(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1996,48 +3234,90 @@ Future<void> showGifts(BuildContext context, String roomId) async {
               'Choose a gift',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
+            const SizedBox(height: 4),
             const TText(
-              'This example gift is recorded on your device; it is not delivered to another person.',
-              style: TextStyle(color: muted),
+              'Example gifts are not delivered to another person.',
+              style: TextStyle(color: muted, fontSize: 12),
             ),
-            for (final gift in gifts)
-              ListTile(
-                title: TText(gift[0] as String),
-                subtitle: TText('${gift[1]} coins'),
-                onTap: () {
-                  final balance = store.get('coins', 0) as int;
-                  final cost = gift[1] as int;
-                  if (balance < cost) {
-                    Navigator.pop(sheet);
-                    notice(
-                      context,
-                      'More coins needed',
-                      'Your current balance is $balance coins.',
-                    );
-                    return;
-                  }
-                  store.state['coins'] = balance - cost;
-                  final records = store.records('roomMessages');
-                  records.insert(0, {
-                    'room': roomId,
-                    'author': store.get('nickname', 'Nani Kohli'),
-                    'text': 'Selected ${gift[0]} as a local gift',
-                  });
-                  store.state['roomMessages'] = records;
-                  store.save();
-                  Navigator.pop(sheet);
-                  notice(
-                    context,
-                    'Gift recorded',
-                    '${gift[0]} was recorded on this device.',
-                  );
-                },
+            const SizedBox(height: 14),
+            LayoutBuilder(
+              builder: (context, constraints) => Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  for (var i = 0; i < gifts.length; i++)
+                    SizedBox(
+                      width: (constraints.maxWidth - 10) / 2,
+                      child: Material(
+                        color: panel2,
+                        borderRadius: BorderRadius.circular(16),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () {
+                            final gift = gifts[i];
+                            final balance = store.get('coins', 0) as int;
+                            final cost = gift[1] as int;
+                            if (balance < cost) {
+                              Navigator.pop(sheet);
+                              notice(
+                                context,
+                                'More coins needed',
+                                'Your current balance is $balance coins.',
+                              );
+                              return;
+                            }
+                            store.state['coins'] = balance - cost;
+                            final records = store.records('roomMessages');
+                            records.insert(0, {
+                              'room': roomId,
+                              'author': store.get('nickname', 'Nani Kohli'),
+                              'text': 'Selected ${gift[0]} as an example gift',
+                            });
+                            store.state['roomMessages'] = records;
+                            store.save();
+                            Navigator.pop(sheet, gift[0] as String);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                giftArtwork(i, size: 64),
+                                TText(
+                                  gifts[i][0] as String,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                TText(
+                                  '${gifts[i][1]} coins',
+                                  style: const TextStyle(
+                                    color: muted,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
+            ),
           ],
         ),
       ),
     ),
   );
+  if (selected != null && showReceipt && context.mounted) {
+    notice(
+      context,
+      'Gift selected',
+      'This example gift is visible only to you.',
+    );
+  }
+  return selected;
 }
 
 class LiveRoom extends StatefulWidget {
@@ -2047,9 +3327,59 @@ class LiveRoom extends StatefulWidget {
   State<LiveRoom> createState() => _LiveRoomState();
 }
 
+Widget liveControl(String label, Widget icon, VoidCallback onTap) => Tooltip(
+  message: tr(label),
+  child: Semantics(
+    button: true,
+    label: tr(label),
+    child: Material(
+      color: const Color(0xff160c29).withValues(alpha: .78),
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: SizedBox(width: 46, height: 46, child: Center(child: icon)),
+      ),
+    ),
+  ),
+);
+
+String activityText(String text) =>
+    text.replaceAll(' as a local gift', ' as an example gift');
+
 class _LiveRoomState extends State<LiveRoom>
     with WidgetsBindingObserver, RouteAware {
   bool routeVisible = true;
+  bool appActive = true;
+  Timer? eventTimer;
+  Timer? sampleTimer;
+  String? eventText;
+  int? eventGift;
+  int eventSerial = 0;
+  int sampleCursor = 2;
+  final List<int> visibleSamples = [0, 1];
+
+  static const sampleActivity = <({String text, int? gift})>[
+    (text: 'What a view!', gift: null),
+    (text: 'Rose', gift: 0),
+    (text: 'Love this moment', gift: null),
+    (text: 'Crown', gift: 2),
+    (text: 'This is beautiful', gift: null),
+    (text: 'Rocket', gift: 3),
+  ];
+
+  void showEvent(String text, {int? gift}) {
+    eventTimer?.cancel();
+    setState(() {
+      eventText = text;
+      eventGift = gift;
+      eventSerial++;
+    });
+    eventTimer = Timer(const Duration(seconds: 4), () {
+      if (mounted) setState(() => eventText = null);
+    });
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -2075,6 +3405,14 @@ class _LiveRoomState extends State<LiveRoom>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    sampleTimer = Timer.periodic(const Duration(milliseconds: 5500), (_) {
+      if (!mounted || !routeVisible || !appActive) return;
+      setState(() {
+        visibleSamples.removeAt(0);
+        visibleSamples.add(sampleCursor % sampleActivity.length);
+        sampleCursor++;
+      });
+    });
     p = VideoPlayerController.asset(
       'assets/videos/${store.data['liveVideos'][store.members.where((m) => m.live).toList().indexWhere((m) => m.id == widget.member.id) % 9]}',
     );
@@ -2091,6 +3429,7 @@ class _LiveRoomState extends State<LiveRoom>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState s) {
+    appActive = s == AppLifecycleState.resumed;
     if (s != AppLifecycleState.resumed) {
       p?.pause();
     } else if (routeVisible) {
@@ -2100,6 +3439,8 @@ class _LiveRoomState extends State<LiveRoom>
 
   @override
   void dispose() {
+    eventTimer?.cancel();
+    sampleTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     routeObserver.unsubscribe(this);
     p?.dispose();
@@ -2110,139 +3451,497 @@ class _LiveRoomState extends State<LiveRoom>
   @override
   Widget build(BuildContext c) {
     final id = 'live:${widget.member.id}';
-    return Screen(
-      'Live',
-      Stack(
-        fit: StackFit.expand,
-        children: [
-          if (p?.value.isInitialized == true)
-            FittedBox(
-              fit: BoxFit.cover,
-              clipBehavior: Clip.hardEdge,
-              child: SizedBox(
-                width: p!.value.size.width,
-                height: p!.value.size.height,
-                child: VideoPlayer(p!),
-              ),
-            )
-          else
-            photo(widget.member.image),
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.center,
-                end: Alignment.bottomCenter,
-                colors: [Colors.transparent, Colors.black87],
-              ),
-            ),
-          ),
-          Positioned(
-            left: 16,
-            right: 16,
-            top: 12,
-            child: Row(
-              children: [
-                avatar(widget.member.image),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TText(
-                    widget.member.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+    final messages = store
+        .records('roomMessages')
+        .where((message) => message['room'] == id)
+        .take(2)
+        .toList()
+        .reversed;
+    final following = store.list('following').contains(widget.member.id);
+    final likes = store.get('liveHeart:${widget.member.id}', 0);
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      body: SafeArea(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (p?.value.isInitialized == true)
+              FittedBox(
+                fit: BoxFit.cover,
+                clipBehavior: Clip.hardEdge,
+                child: SizedBox(
+                  width: p!.value.size.width,
+                  height: p!.value.size.height,
+                  child: VideoPlayer(p!),
+                ),
+              )
+            else
+              photo(widget.member.image),
+            const IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0xb5000010),
+                      Colors.transparent,
+                      Color(0xf2000010),
+                    ],
+                    stops: [0, .35, 1],
                   ),
                 ),
-                TextButton(
-                  onPressed: () => open(c, MemberPage(widget.member)),
-                  child: const TText('Profile'),
-                ),
-                TextButton(
-                  onPressed: () => safety(c, id, widget.member),
-                  child: const TText('Report'),
-                ),
-              ],
+              ),
             ),
-          ),
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: 10,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const TText(
-                  'Editorial video · local playback',
-                  style: TextStyle(color: Colors.white70),
-                ),
-                Row(
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        store.toggle('following', widget.member.id);
-                        setState(() {});
-                      },
-                      child: TText(
-                        store.list('following').contains(widget.member.id)
-                            ? 'Following'
-                            : 'Follow',
+            Positioned(
+              top: 10,
+              left: 12,
+              right: 12,
+              child: Row(
+                children: [
+                  liveControl(
+                    'Back',
+                    controlArtwork(0, size: 22),
+                    () => Navigator.maybePop(c),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Material(
+                      color: const Color(0xff160c29).withValues(alpha: .78),
+                      borderRadius: BorderRadius.circular(16),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () => open(c, MemberPage(widget.member)),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 7,
+                            vertical: 5,
+                          ),
+                          child: Row(
+                            children: [
+                              avatar(widget.member.image, size: 36),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    TText(
+                                      widget.member.name,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const TText(
+                                      'Preview',
+                                      style: TextStyle(
+                                        color: Color(0xffffb4df),
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
+                  ),
+                  const SizedBox(width: 6),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: following
+                          ? panel2.withValues(alpha: .9)
+                          : pink,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(48, 46),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                    ),
+                    onPressed: () => setState(
+                      () => store.toggle('following', widget.member.id),
+                    ),
+                    child: TText(following ? 'Following' : 'Follow'),
+                  ),
+                  const SizedBox(width: 6),
+                  liveControl(
+                    'Report',
+                    reelArtwork(0, size: 24),
+                    () => safety(c, id, widget.member),
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 216,
+              child: IgnorePointer(
+                child: AnimatedSwitcher(
+                  duration: MediaQuery.of(c).disableAnimations
+                      ? Duration.zero
+                      : const Duration(milliseconds: 260),
+                  transitionBuilder: (child, animation) => SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(.25, 0),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: FadeTransition(opacity: animation, child: child),
+                  ),
+                  child: eventText == null
+                      ? const SizedBox.shrink()
+                      : TweenAnimationBuilder<double>(
+                          key: ValueKey(eventSerial),
+                          tween: Tween(begin: 0, end: 1),
+                          duration: MediaQuery.of(c).disableAnimations
+                              ? Duration.zero
+                              : const Duration(seconds: 4),
+                          builder: (context, progress, child) =>
+                              Transform.translate(
+                                offset: MediaQuery.of(context).disableAnimations
+                                    ? Offset.zero
+                                    : Offset(
+                                        (.7 - progress) *
+                                            MediaQuery.sizeOf(context).width *
+                                            .6,
+                                        0,
+                                      ),
+                                child: child,
+                              ),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                              constraints: const BoxConstraints(maxWidth: 290),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                  0xff452050,
+                                ).withValues(alpha: .92),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (eventGift != null) ...[
+                                    giftArtwork(eventGift!, size: 38),
+                                    const SizedBox(width: 6),
+                                  ],
+                                  Flexible(
+                                    child: TText(
+                                      eventText!,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                ),
+              ),
+            ),
+            Positioned(
+              left: 12,
+              right: 12,
+              bottom: 12,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AnimatedSwitcher(
+                    duration: MediaQuery.of(c).disableAnimations
+                        ? Duration.zero
+                        : const Duration(milliseconds: 260),
+                    child: Column(
+                      key: ValueKey(sampleCursor),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (final index in visibleSamples)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 5),
+                            child: Container(
+                              constraints: const BoxConstraints(maxWidth: 280),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                  0xff160c29,
+                                ).withValues(alpha: .75),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (sampleActivity[index].gift != null) ...[
+                                    giftArtwork(
+                                      sampleActivity[index].gift!,
+                                      size: 27,
+                                    ),
+                                    const SizedBox(width: 5),
+                                  ],
+                                  Flexible(
+                                    child: Text.rich(
+                                      TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: '${tr('Sample')}: ',
+                                            style: const TextStyle(
+                                              color: Color(0xffffafd9),
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: tr(
+                                              sampleActivity[index].text,
+                                            ),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  for (final msg in messages)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 5),
+                      child: Container(
+                        constraints: const BoxConstraints(maxWidth: 280),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xff160c29).withValues(alpha: .75),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '${msg['author']}: ',
+                                style: const TextStyle(
+                                  color: Color(0xffffafd9),
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              TextSpan(
+                                text: activityText(msg['text'] as String),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: field,
+                          textInputAction: TextInputAction.send,
+                          onSubmitted: (_) => sendMessage(id),
+                          decoration: InputDecoration(
+                            hintText: tr('Write a message'),
+                            fillColor: const Color(
+                              0xff160c29,
+                            ).withValues(alpha: .84),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      liveControl('Gift', giftArtwork(4, size: 34), () async {
+                        final name = await showGifts(c, id, showReceipt: false);
+                        if (!mounted || name == null) return;
+                        final giftIndex = [
+                          'Rose',
+                          'Kiss',
+                          'Crown',
+                          'Rocket',
+                        ].indexOf(name);
+                        showEvent(
+                          'Example gift: $name',
+                          gift: giftIndex < 0 ? 4 : giftIndex,
+                        );
+                      }),
+                      const SizedBox(width: 6),
+                      liveControl('Like', reelArtwork(1, size: 25), () {
                         final key = 'liveHeart:${widget.member.id}';
                         store.put(key, (store.get(key, 0) as int) + 1);
-                        setState(() {});
-                      },
+                        showEvent('Like · ${store.get(key, 0)}');
+                      }),
+                      const SizedBox(width: 6),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: pink,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(50, 46),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                        ),
+                        onPressed: () => sendMessage(id),
+                        child: const TText('Send'),
+                      ),
+                    ],
+                  ),
+                  if ((likes as int) > 0)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4, left: 4),
                       child: TText(
-                        'Like · ${store.get('liveHeart:${widget.member.id}', 0)}',
+                        'Like · $likes',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 11,
+                        ),
                       ),
                     ),
-                  ],
-                ),
-                for (final msg
-                    in store
-                        .records('roomMessages')
-                        .where((m) => m['room'] == id)
-                        .take(3)
-                        .toList()
-                        .reversed)
-                  TText('${msg['author']}: ${msg['text']}'),
-                Row(
-                  children: [
-                    Expanded(
-                      child: composer(field, () {
-                        if (!allowed(field.text)) {
-                          notice(
-                            c,
-                            'Message not sent',
-                            'Please enter a clear, safe message.',
-                          );
-                          return;
-                        }
-                        store.addRecord('roomMessages', {
-                          'room': id,
-                          'author': store.get('nickname', 'Nani Kohli'),
-                          'text': field.text.trim(),
-                        });
-                        field.clear();
-                        setState(() {});
-                      }),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        await showGifts(c, id);
-                        if (mounted) setState(() {});
-                      },
-                      child: const TText('Gift'),
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
+
+  void sendMessage(String id) {
+    final text = field.text.trim();
+    if (!allowed(text)) {
+      notice(
+        context,
+        'Message not sent',
+        'Please enter a clear, safe message.',
+      );
+      return;
+    }
+    final author = store.get('nickname', 'Nani Kohli') as String;
+    store.addRecord('roomMessages', {
+      'room': id,
+      'author': author,
+      'text': text,
+    });
+    field.clear();
+    showEvent('$author: $text');
+  }
 }
+
+Widget inboxShortcut({
+  required String title,
+  required String subtitle,
+  required int artwork,
+  required Color color,
+  required VoidCallback onTap,
+}) => TotiPressable(
+  onTap: onTap,
+  child: Container(
+    constraints: const BoxConstraints(minHeight: 88),
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+    decoration: BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(18),
+    ),
+    child: Row(
+      children: [
+        inboxArtwork(artwork, size: 40),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TText(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 4),
+              TText(
+                subtitle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Color(0xffd7c5df), fontSize: 11),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  ),
+);
+
+Widget inboxEmpty(int artwork, String title, String detail) => Padding(
+  padding: const EdgeInsets.fromLTRB(12, 44, 12, 24),
+  child: Column(
+    children: [
+      inboxArtwork(artwork, size: 76),
+      const SizedBox(height: 14),
+      TText(
+        title,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      const SizedBox(height: 6),
+      TText(
+        detail,
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: muted, fontSize: 13, height: 1.4),
+      ),
+    ],
+  ),
+);
+
+Widget inboxRows(List<Widget> rows) => Material(
+  color: const Color(0xff190c31),
+  borderRadius: BorderRadius.circular(18),
+  clipBehavior: Clip.antiAlias,
+  child: Column(
+    children: [
+      for (var i = 0; i < rows.length; i++) ...[
+        if (i > 0)
+          const Padding(
+            padding: EdgeInsets.only(left: 76, right: 14),
+            child: Divider(height: 1, thickness: .5, color: Color(0xff42314e)),
+          ),
+        rows[i],
+      ],
+    ],
+  ),
+);
 
 class Inbox extends StatefulWidget {
   const Inbox({super.key});
@@ -2252,6 +3951,7 @@ class Inbox extends StatefulWidget {
 
 class _InboxState extends State<Inbox> {
   String tab = 'Message';
+
   @override
   Widget build(BuildContext c) {
     final notices = store
@@ -2272,119 +3972,262 @@ class _InboxState extends State<Inbox> {
               store.records('messages').any((x) => x['member'] == m.id),
         )
         .toList();
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        header('Messages'),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: action(
-                'Platform updates',
-                () => open(c, const PlatformUpdates()),
-              ),
+    final messageRows = <Widget>[];
+    for (final n in notices) {
+      final member = store.members
+          .where((m) => m.id == n['member'])
+          .firstOrNull;
+      if (member == null) continue;
+      messageRows.add(
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 6,
+          ),
+          leading: avatar(member.image, size: 48),
+          title: TText(
+            member.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
             ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: action(
-                'Followers',
-                () => open(c, const Relationships('Followers')),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TText(
+                n['text'] as String,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Color(0xffe7cce1), fontSize: 12),
               ),
-            ),
-          ],
+              const TText(
+                'Example profile activity',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: muted, fontSize: 11),
+              ),
+            ],
+          ),
+          trailing: n['read'] == true
+              ? null
+              : Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xff5c204f),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const TText(
+                    'NEW',
+                    style: TextStyle(
+                      color: Color(0xffffb7db),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+          onTap: () {
+            final all = store.records('notices');
+            for (final item in all) {
+              if (item['member'] == n['member'] && item['text'] == n['text']) {
+                item['read'] = true;
+              }
+            }
+            store.put('notices', all);
+            setState(() {});
+            open(c, MemberPage(member));
+          },
         ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
+      );
+    }
+    for (final member in conversations) {
+      final recent = store
+          .records('messages')
+          .firstWhere((x) => x['member'] == member.id);
+      messageRows.add(
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 6,
+          ),
+          leading: avatar(member.image, size: 48),
+          title: TText(
+            member.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TText(
+                recent['text'] as String,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Color(0xffd8c9de), fontSize: 12),
+              ),
+              const TText(
+                'Only visible to you',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: muted, fontSize: 11),
+              ),
+            ],
+          ),
+          onTap: () => open(c, Conversation(member)),
+        ),
+      );
+    }
+    final followingRows = [
+      for (final member in following)
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 6,
+          ),
+          leading: avatar(member.image, size: 48),
+          title: TText(
+            member.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          subtitle: const TText(
+            'Example profile · Following',
+            style: TextStyle(color: muted, fontSize: 12),
+          ),
+          trailing: actionArtwork(4, size: 18),
+          onTap: () => store.mutual(member)
+              ? open(c, Conversation(member))
+              : open(c, MemberPage(member)),
+        ),
+    ];
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
+      children: [
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: inboxShortcut(
+                  title: 'Platform updates',
+                  subtitle: 'Example activity',
+                  artwork: 0,
+                  color: const Color(0xff2a1542),
+                  onTap: () => open(c, const PlatformUpdates()),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: inboxShortcut(
+                  title: 'Followers',
+                  subtitle: 'Example profiles',
+                  artwork: 1,
+                  color: const Color(0xff35173d),
+                  onTap: () => open(c, const Relationships('Followers')),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 18),
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: const Color(0xff190b32),
+            borderRadius: BorderRadius.circular(15),
+          ),
           child: Row(
             children: [
               for (final t in ['Message', 'Follow', 'Calls', 'Moments'])
-                TextButton(
-                  onPressed: () => setState(() => tab = t),
-                  child: TText(
-                    t,
-                    style: TextStyle(
-                      color: t == tab ? pink : muted,
-                      fontWeight: t == tab
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                Expanded(
+                  child: Semantics(
+                    selected: t == tab,
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor: t == tab
+                            ? const Color(0xff593286)
+                            : Colors.transparent,
+                        foregroundColor: t == tab
+                            ? Colors.white
+                            : const Color(0xffc9b9d2),
+                        minimumSize: const Size(0, 42),
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(11),
+                        ),
+                      ),
+                      onPressed: () => setState(() => tab = t),
+                      child: TText(
+                        t,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
                   ),
                 ),
             ],
           ),
         ),
-        if (tab == 'Message') ...[
-          for (final n in notices)
-            if (n['member'] != null)
-              ListTile(
-                leading: avatar(
-                  store.members.firstWhere((m) => m.id == n['member']).image,
-                ),
-                title: TText(n['text']),
-                subtitle: const TText('Example profile activity'),
-                trailing: n['read'] == true ? null : const TText('NEW'),
-                onTap: () {
-                  n['read'] = true;
-                  final all = store.records('notices');
-                  for (final item in all) {
-                    if (item['member'] == n['member'] &&
-                        item['text'] == n['text']) {
-                      item['read'] = true;
-                    }
-                  }
-                  store.put('notices', all);
-                  setState(() {});
-                  open(
-                    c,
-                    MemberPage(
-                      store.members.firstWhere((m) => m.id == n['member']),
-                    ),
-                  );
-                },
-              ),
-          for (final m in conversations)
-            ListTile(
-              leading: avatar(m.image),
-              title: TText(m.name),
-              subtitle: TText(
-                store
-                    .records('messages')
-                    .firstWhere((x) => x['member'] == m.id)['text'],
-              ),
-              onTap: () => open(c, Conversation(m)),
-            ),
-          if (notices.isEmpty && conversations.isEmpty)
-            const ListTile(
-              title: TText('No messages yet'),
-              subtitle: TText('Mutual follows can start a conversation'),
-            ),
-        ] else if (tab == 'Follow') ...[
-          if (following.isEmpty)
-            const ListTile(
-              title: TText('No followed people yet'),
-              subtitle: TText('Follow someone from Discover to see them here'),
-            ),
-          for (final m in following)
-            ListTile(
-              leading: avatar(m.image),
-              title: TText(m.name),
-              subtitle: TText('Following · ${m.country}'),
-              onTap: () => store.mutual(m)
-                  ? open(c, Conversation(m))
-                  : open(c, MemberPage(m)),
-            ),
-        ] else if (tab == 'Calls')
-          const ListTile(
-            title: TText('No recent calls'),
-            subtitle: TText('Calls are not connected'),
-          )
+        const SizedBox(height: 12),
+        if (tab == 'Message')
+          messageRows.isEmpty
+              ? inboxEmpty(
+                  2,
+                  'No messages yet',
+                  'Mutual follows can start a conversation',
+                )
+              : inboxRows(messageRows)
+        else if (tab == 'Follow')
+          followingRows.isEmpty
+              ? inboxEmpty(
+                  1,
+                  'No followed people yet',
+                  'Follow someone from Discover to see them here',
+                )
+              : inboxRows(followingRows)
+        else if (tab == 'Calls')
+          inboxEmpty(3, 'No recent calls', 'Calls are not connected')
         else
-          ListTile(
-            title: const TText('Moments'),
-            subtitle: const TText('Browse the community feed'),
-            onTap: () => open(c, const Moments()),
-          ),
+          inboxRows([
+            ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 8,
+              ),
+              leading: inboxArtwork(4, size: 42),
+              title: const TText(
+                'Moments',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              subtitle: const TText(
+                'Browse the community feed',
+                style: TextStyle(color: muted, fontSize: 12),
+              ),
+              trailing: actionArtwork(4, size: 18),
+              onTap: () => open(c, const Moments()),
+            ),
+          ]),
       ],
     );
   }
@@ -2406,6 +4249,7 @@ class _PlatformUpdatesState extends State<PlatformUpdates> {
     return Screen(
       'Platform updates',
       ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         children: [
           if (notices.isNotEmpty)
             TextButton(
@@ -2419,25 +4263,46 @@ class _PlatformUpdatesState extends State<PlatformUpdates> {
               },
               child: const TText('Mark all read'),
             ),
+          const SizedBox(height: 10),
           if (notices.isEmpty)
-            const ListTile(
-              title: TText("You're all caught up"),
-              subtitle: TText(
-                'Account, safety and community updates will appear here.',
-              ),
-            ),
-          for (final n in notices)
-            ListTile(
-              title: TText(n['text']),
-              subtitle: TText(
-                store.members
-                        .where((m) => m.id == n['member'])
-                        .map((m) => m.name)
-                        .firstOrNull ??
-                    '',
-              ),
-              trailing: n['read'] == true ? null : const TText('NEW'),
-            ),
+            inboxEmpty(
+              0,
+              "You're all caught up",
+              'Account, safety and community updates will appear here.',
+            )
+          else
+            inboxRows([
+              for (final n in notices)
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 6,
+                  ),
+                  leading: inboxArtwork(0, size: 36),
+                  title: TText(
+                    n['text'],
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TText(
+                        store.members
+                                .where((m) => m.id == n['member'])
+                                .map((m) => m.name)
+                                .firstOrNull ??
+                            '',
+                      ),
+                      if (n['member'] != null)
+                        const TText(
+                          'Example profile activity',
+                          style: TextStyle(color: muted, fontSize: 11),
+                        ),
+                    ],
+                  ),
+                  trailing: n['read'] == true ? null : const TText('NEW'),
+                ),
+            ]),
         ],
       ),
     );
@@ -2474,7 +4339,7 @@ class _ConversationState extends State<Conversation> {
           const Padding(
             padding: EdgeInsets.all(10),
             child: TText(
-              'Messages are saved on this device only.',
+              'Only you can see these messages; they are not sent to anyone.',
               style: TextStyle(color: muted),
             ),
           ),
@@ -2497,42 +4362,47 @@ class _ConversationState extends State<Conversation> {
               ],
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: () {
-                  if (store.mutual(m)) {
-                    open(c, CallPreview(m, video: false));
-                  } else {
-                    notice(
-                      c,
-                      'Mutual follow required',
-                      'Both people must follow each other.',
-                    );
-                  }
-                },
-                child: const TText('Voice call'),
-              ),
-              TextButton(
-                onPressed: () {
-                  if (store.mutual(m)) {
-                    open(c, CallPreview(m, video: true));
-                  } else {
-                    notice(
-                      c,
-                      'Mutual follow required',
-                      'Both people must follow each other.',
-                    );
-                  }
-                },
-                child: const TText('Video call'),
-              ),
-              TextButton(
-                onPressed: () => safety(c, 'chat:${m.id}', m),
-                child: const TText('Report'),
-              ),
-            ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                TextButton(
+                  onPressed: () {
+                    if (store.mutual(m)) {
+                      open(c, CallPreview(m, video: false));
+                    } else {
+                      notice(
+                        c,
+                        'Mutual follow required',
+                        'Both people must follow each other.',
+                      );
+                    }
+                  },
+                  child: iconLabel(utilityArtwork(0, size: 18), 'Voice call'),
+                ),
+                const SizedBox(width: 8),
+                TextButton(
+                  onPressed: () {
+                    if (store.mutual(m)) {
+                      open(c, CallPreview(m, video: true));
+                    } else {
+                      notice(
+                        c,
+                        'Mutual follow required',
+                        'Both people must follow each other.',
+                      );
+                    }
+                  },
+                  child: iconLabel(utilityArtwork(1, size: 18), 'Video call'),
+                ),
+                const SizedBox(width: 8),
+                TextButton(
+                  onPressed: () => safety(c, 'chat:${m.id}', m),
+                  child: iconLabel(utilityArtwork(2, size: 18), 'Report'),
+                ),
+              ],
+            ),
           ),
           composer(field, () {
             if (!store.mutual(m)) {
@@ -2732,7 +4602,7 @@ class _CallPreviewState extends State<CallPreview> with WidgetsBindingObserver {
                 ),
                 const SizedBox(height: 6),
                 const TText(
-                  'Local preview only · no call is connected',
+                  'Preview only · no call is connected',
                   textAlign: TextAlign.center,
                 ),
                 TText(
@@ -2783,6 +4653,7 @@ void createMenu(BuildContext c) {
         children: [
           const ListTile(title: TText('What do you want to share?')),
           ListTile(
+            leading: utilityArtwork(1, size: 32),
             title: const TText('Go live'),
             subtitle: const TText('Camera and microphone'),
             onTap: () {
@@ -2791,6 +4662,7 @@ void createMenu(BuildContext c) {
             },
           ),
           ListTile(
+            leading: utilityArtwork(1, size: 32),
             title: const TText('Post a video'),
             onTap: () {
               Navigator.pop(d);
@@ -2798,6 +4670,7 @@ void createMenu(BuildContext c) {
             },
           ),
           ListTile(
+            leading: cardArtwork(1),
             title: const TText('Share a moment'),
             onTap: () {
               Navigator.pop(d);
@@ -2821,14 +4694,14 @@ class Moments extends StatelessWidget {
         {
           'author': 'Mia Calder',
           'text': 'Slow mornings and a new favorite corner of the city.',
-          'image': 'boulevard-snack-stop.jpg',
+          'image': 'moment-stills/garden-day-live.jpg',
           'id': 'seed-0',
           'member': 'member-0',
         },
         {
           'author': 'Amara Ndlovu',
           'text': 'What song has been on repeat for you lately?',
-          'image': 'evening-cat-cafe.jpg',
+          'image': 'moment-stills/above-clouds-broadcast.jpg',
           'id': 'seed-1',
           'member': 'member-8',
         },
@@ -2885,33 +4758,55 @@ class Moments extends StatelessWidget {
                                   ),
                           ),
                         ),
-                      Row(
-                        children: [
-                          TextButton(
-                            onPressed: () =>
-                                store.toggle('likes', 'moment:${e['id']}'),
-                            child: TText(
-                              store.list('likes').contains('moment:${e['id']}')
-                                  ? 'Liked'
-                                  : 'Like',
+                      const SizedBox(height: 10),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            TextButton(
+                              onPressed: () =>
+                                  store.toggle('likes', 'moment:${e['id']}'),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  actionArtwork(0, size: 18),
+                                  const SizedBox(width: 6),
+                                  TText(
+                                    store
+                                            .list('likes')
+                                            .contains('moment:${e['id']}')
+                                        ? 'Liked'
+                                        : 'Like',
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          TextButton(
-                            onPressed: () =>
-                                open(c, Comments('moment:${e['id']}')),
-                            child: const TText('Comment'),
-                          ),
-                          TextButton(
-                            onPressed: () => safety(
-                              c,
-                              'moment:${e['id']}',
-                              store.members
-                                  .where((m) => m.id == e['member'])
-                                  .firstOrNull,
+                            const SizedBox(width: 8),
+                            TextButton(
+                              onPressed: () =>
+                                  showComments(c, 'moment:${e['id']}'),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  actionArtwork(1, size: 18),
+                                  const SizedBox(width: 6),
+                                  const TText('Comment'),
+                                ],
+                              ),
                             ),
-                            child: const TText('Report'),
-                          ),
-                        ],
+                            const SizedBox(width: 8),
+                            TextButton(
+                              onPressed: () => safety(
+                                c,
+                                'moment:${e['id']}',
+                                store.members
+                                    .where((m) => m.id == e['member'])
+                                    .firstOrNull,
+                              ),
+                              child: const TText('Report'),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -2983,7 +4878,7 @@ class _MomentEditorState extends State<MomentEditor> {
       padding: const EdgeInsets.all(18),
       children: [
         const TText(
-          'Your submission is saved locally as pending. There is no connected review service.',
+          'Your draft is not sent for review; no review service is connected.',
           style: TextStyle(color: muted),
         ),
         const SizedBox(height: 16),
@@ -2995,7 +4890,6 @@ class _MomentEditorState extends State<MomentEditor> {
             hintText: 'Share a thought',
             filled: true,
             fillColor: panel,
-            border: OutlineInputBorder(borderSide: BorderSide.none),
           ),
         ),
         TextButton(
@@ -3007,7 +4901,7 @@ class _MomentEditorState extends State<MomentEditor> {
           ),
         ),
         const SizedBox(height: 16),
-        action('Submit', () async {
+        action('Save draft', () async {
           if (!allowed(text.text)) {
             notice(c, 'Please revise', 'Enter a clear, safe message.');
             return;
@@ -3040,11 +4934,7 @@ class _MomentEditorState extends State<MomentEditor> {
           });
           if (c.mounted) {
             Navigator.pop(c);
-            notice(
-              c,
-              'Saved as pending',
-              'Your submission is stored on this device.',
-            );
+            notice(c, 'Draft saved', 'Your draft is not sent for review.');
           }
         }, primary: true),
       ],
@@ -3064,91 +4954,186 @@ class Profile extends StatelessWidget {
       return ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () => open(c, const Settings()),
-              child: const TText('Settings'),
-            ),
-          ),
-          Center(child: avatar('riverside-black-dress.jpg', size: 90)),
-          const SizedBox(height: 12),
-          Center(
-            child: TText(
-              store.get('nickname', 'Nani Kohli'),
-              style: const TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Center(
-            child: TText(
-              '${store.get('gender', 'Female')}  ·  ${store.get('country', 'SG')}',
-              style: const TextStyle(color: muted),
-            ),
-          ),
-          Center(
-            child: TextButton(
-              onPressed: () => open(c, const EditProfile()),
-              child: const TText('Edit profile'),
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              for (final entry in {
-                'Friends': following.where(followers.contains).length,
-                'Following': following.length,
-                'Followers': followers.length,
-              }.entries)
-                Expanded(
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                    ),
-                    onPressed: () => open(c, Relationships(entry.key)),
-                    child: Column(
-                      children: [
-                        TText(
-                          '${entry.value}',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        TText(
-                          entry.key,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: Image.asset(
+                    'assets/art/toti-profile-background.png',
+                    fit: BoxFit.cover,
                   ),
                 ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: const Color(0xfff0b8de),
+                                width: 2,
+                              ),
+                            ),
+                            child: myAvatar(size: 70),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TText(
+                                  store.get('nickname', 'Nani Kohli'),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                TText(
+                                  '${store.get('gender', 'Female')}  ·  ${store.get('country', 'SG')}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Color(0xffe6cedf),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const SizedBox(height: 7),
+                                TextButton(
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: const Color(
+                                      0xff2a143b,
+                                    ).withValues(alpha: .85),
+                                    foregroundColor: Colors.white,
+                                    minimumSize: const Size(0, 40),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  onPressed: () => open(c, const EditProfile()),
+                                  child: const TText(
+                                    'Edit profile',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          liveControl(
+                            'Settings',
+                            actionArtwork(3, size: 22),
+                            () => open(c, const Settings()),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xff10091f).withValues(alpha: .60),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Row(
+                          children: [
+                            for (final entry in {
+                              'Friends': following
+                                  .where(followers.contains)
+                                  .length,
+                              'Following': following.length,
+                              'Followers': followers.length,
+                            }.entries)
+                              Expanded(
+                                child: TextButton(
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    foregroundColor: Colors.white,
+                                    minimumSize: const Size(0, 56),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 3,
+                                      vertical: 6,
+                                    ),
+                                  ),
+                                  onPressed: () =>
+                                      open(c, Relationships(entry.key)),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      TText(
+                                        '${entry.value}',
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      TText(
+                                        entry.key,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: Color(0xffe4cedf),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 12),
-          InkWell(
+          TotiPressable(
             onTap: () => open(c, const Vault()),
             child: Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xff7029f2), pink],
+                  colors: [Color(0xff502978), Color(0xffa02f80)],
                 ),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  const TText('MY COIN VAULT'),
-                  TText(
-                    '${store.get('coins', 0)}',
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const TText('MY COIN VAULT'),
+                        const SizedBox(height: 4),
+                        TText(
+                          '${store.get('coins', 0)}',
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const TText('View balance'),
+                      ],
                     ),
                   ),
-                  const TText('View balance'),
+                  const SizedBox(width: 12),
+                  cardArtwork(0, size: 60),
                 ],
               ),
             ),
@@ -3157,6 +5142,8 @@ class Profile extends StatelessWidget {
           card(
             Row(
               children: [
+                cardArtwork(0, size: 36),
+                const SizedBox(width: 10),
                 const Expanded(
                   child: TText(
                     'Daily Coin Drop  +50',
@@ -3194,19 +5181,27 @@ class Profile extends StatelessWidget {
             Column(
               children: [
                 ListTile(
+                  leading: cardArtwork(1),
                   title: const TText('Moments'),
+                  trailing: actionArtwork(4, size: 20),
                   onTap: () => open(c, const Moments()),
                 ),
                 ListTile(
+                  leading: cardArtwork(2),
                   title: const TText('My submissions'),
+                  trailing: actionArtwork(4, size: 20),
                   onTap: () => open(c, const Pending()),
                 ),
                 ListTile(
+                  leading: cardArtwork(3),
                   title: const TText('Effect Boutique'),
+                  trailing: actionArtwork(4, size: 20),
                   onTap: () => open(c, const Boutique()),
                 ),
                 ListTile(
+                  leading: cardArtwork(4),
                   title: const TText('Backpack'),
+                  trailing: actionArtwork(4, size: 20),
                   onTap: () => open(c, const Backpack()),
                 ),
               ],
@@ -3239,15 +5234,19 @@ class Relationships extends StatelessWidget {
     return Screen(
       scope,
       ms.isEmpty
-          ? const Center(child: TText('No connections yet'))
+          ? emptyState('No connections yet', artwork: 1)
           : ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               children: [
                 for (final m in ms)
-                  ListTile(
-                    leading: avatar(m.image),
-                    title: TText(m.name),
-                    subtitle: TText(m.region),
-                    onTap: () => open(c, MemberPage(m)),
+                  listCard(
+                    ListTile(
+                      leading: avatar(m.image),
+                      title: TText(m.name),
+                      subtitle: TText(m.region),
+                      trailing: actionArtwork(4, size: 18),
+                      onTap: () => open(c, MemberPage(m)),
+                    ),
                   ),
               ],
             ),
@@ -3264,6 +5263,8 @@ class EditProfile extends StatefulWidget {
 class _EditProfileState extends State<EditProfile> {
   late TextEditingController name, birthday, country;
   String gender = 'Female';
+  XFile? selectedAvatar;
+  bool saving = false;
   @override
   void initState() {
     super.initState();
@@ -3281,12 +5282,99 @@ class _EditProfileState extends State<EditProfile> {
     super.dispose();
   }
 
+  Future<void> chooseAvatar() async {
+    try {
+      final image = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1600,
+        maxHeight: 1600,
+        imageQuality: 90,
+      );
+      if (mounted && image != null) setState(() => selectedAvatar = image);
+    } catch (_) {
+      if (mounted) {
+        notice(context, 'Could not select photo', 'Please try again.');
+      }
+    }
+  }
+
+  Future<void> saveProfile() async {
+    if (saving) return;
+    final date = DateTime.tryParse(birthday.text);
+    final now = DateTime.now();
+    final adult =
+        date != null &&
+        !date.isAfter(DateTime(now.year - 18, now.month, now.day));
+    if (!allowed(name.text) || !adult || country.text.trim().isEmpty) {
+      notice(
+        context,
+        'Check your profile',
+        'Enter a nickname, country and valid adult birthday.',
+      );
+      return;
+    }
+    setState(() => saving = true);
+    String? avatarPath;
+    try {
+      if (selectedAvatar != null) {
+        final directory = await getApplicationDocumentsDirectory();
+        avatarPath =
+            '${directory.path}/toti_avatar_${DateTime.now().microsecondsSinceEpoch}';
+        await File(selectedAvatar!.path).copy(avatarPath);
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() => saving = false);
+        notice(context, 'Could not save photo', 'Please try again.');
+      }
+      return;
+    }
+    if (!mounted) return;
+    store.state.addAll({
+      'nickname': name.text.trim(),
+      'gender': gender,
+      'birthday': birthday.text,
+      'country': country.text.trim(),
+    });
+    if (avatarPath != null) store.state['avatarPath'] = avatarPath;
+    store.save();
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext c) => Screen(
     'Edit profile',
     ListView(
       padding: const EdgeInsets.all(18),
       children: [
+        Center(
+          child: TextButton(
+            onPressed: saving ? null : chooseAvatar,
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xffefb4df),
+                      width: 2,
+                    ),
+                  ),
+                  child: myAvatar(size: 86, previewPath: selectedAvatar?.path),
+                ),
+                const SizedBox(height: 8),
+                iconLabel(cardArtwork(1, size: 22), 'Change photo'),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
         TextField(
           controller: name,
           maxLength: 40,
@@ -3294,6 +5382,7 @@ class _EditProfileState extends State<EditProfile> {
         ),
         DropdownButtonFormField<String>(
           initialValue: gender,
+          icon: controlArtwork(4, size: 20),
           items: [
             'Female',
             'Male',
@@ -3311,29 +5400,13 @@ class _EditProfileState extends State<EditProfile> {
           decoration: const InputDecoration(labelText: 'Country'),
         ),
         const SizedBox(height: 22),
-        action('Save', () {
-          final date = DateTime.tryParse(birthday.text);
-          final now = DateTime.now();
-          final adult =
-              date != null &&
-              !date.isAfter(DateTime(now.year - 18, now.month, now.day));
-          if (!allowed(name.text) || !adult || country.text.trim().isEmpty) {
-            notice(
-              c,
-              'Check your profile',
-              'Enter a nickname, country and valid adult birthday.',
-            );
-            return;
-          }
-          store.state.addAll({
-            'nickname': name.text.trim(),
-            'gender': gender,
-            'birthday': birthday.text,
-            'country': country.text.trim(),
-          });
-          store.save();
-          Navigator.pop(c);
-        }, primary: true),
+        SizedBox(
+          height: 48,
+          child: FilledButton(
+            onPressed: saving ? null : saveProfile,
+            child: TText(saving ? 'Saving…' : 'Save'),
+          ),
+        ),
       ],
     ),
   );
@@ -3377,7 +5450,7 @@ class _VaultState extends State<Vault> {
         if (mounted) {
           setState(() {
             loading = false;
-            error = 'Google Play is unavailable on this device.';
+            error = 'Google Play is unavailable.';
           });
         }
         return;
@@ -3413,17 +5486,24 @@ class _VaultState extends State<Vault> {
       padding: const EdgeInsets.all(18),
       children: [
         card(
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              const TText('YOUR BALANCE'),
-              TText(
-                '${store.get('coins', 0)} coins',
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const TText('YOUR BALANCE'),
+                    TText(
+                      '${store.get('coins', 0)} coins',
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
+              cardArtwork(0, size: 54),
             ],
           ),
         ),
@@ -3442,16 +5522,19 @@ class _VaultState extends State<Vault> {
           TextButton(onPressed: load, child: const TText('Try again')),
         ] else ...[
           for (final p in products)
-            ListTile(
-              title: TText('${coinProducts[p.id]} coins'),
-              subtitle: TText(p.price),
-              trailing: TextButton(
-                onPressed: () => notice(
-                  c,
-                  'Purchases unavailable',
-                  'Purchase verification is not configured yet.',
+            listCard(
+              ListTile(
+                leading: cardArtwork(0),
+                title: TText('${coinProducts[p.id]} coins'),
+                subtitle: TText(p.price),
+                trailing: TextButton(
+                  onPressed: () => notice(
+                    c,
+                    'Purchases unavailable',
+                    'Purchase verification is not configured yet.',
+                  ),
+                  child: const TText('Unavailable'),
                 ),
-                child: const TText('Unavailable'),
               ),
             ),
         ],
@@ -3544,6 +5627,10 @@ class _BoutiqueState extends State<Boutique> {
               child: card(
                 Row(
                   children: [
+                    e[3] == 'Live Gift'
+                        ? actionArtwork(2, size: 36)
+                        : cardArtwork(3, size: 36),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -3580,7 +5667,7 @@ class _BoutiqueState extends State<Boutique> {
                         notice(
                           c,
                           'Added to Backpack',
-                          '${e[1]} was collected on this device.',
+                          '${e[1]} was added to your collection.',
                         );
                       },
                       child: const TText('Collect'),
@@ -3607,13 +5694,17 @@ class Backpack extends StatelessWidget {
     return Screen(
       'Backpack',
       items.isEmpty
-          ? const Center(child: TText('Your backpack is empty'))
+          ? emptyState('Your backpack is empty', artwork: 4)
           : ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               children: [
                 for (final e in items)
-                  ListTile(
-                    title: TText(e['name']),
-                    subtitle: const TText('Collected effect'),
+                  listCard(
+                    ListTile(
+                      leading: cardArtwork(3),
+                      title: TText(e['name']),
+                      subtitle: const TText('Collected effect'),
+                    ),
                   ),
               ],
             ),
@@ -3629,14 +5720,18 @@ class Pending extends StatelessWidget {
     return Screen(
       'My submissions',
       items.isEmpty
-          ? const Center(child: TText('No submissions yet'))
+          ? emptyState('No submissions yet', artwork: 2)
           : ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               children: [
                 for (final e in items)
-                  ListTile(
-                    title: TText(e['text']),
-                    subtitle: const TText(
-                      'Pending locally · no review service connected',
+                  listCard(
+                    ListTile(
+                      leading: cardArtwork(2),
+                      title: TText(e['text']),
+                      subtitle: const TText(
+                        'Not sent · no review service connected',
+                      ),
                     ),
                   ),
               ],
@@ -3653,105 +5748,135 @@ class Settings extends StatelessWidget {
     builder: (c, _) => Screen(
       'Settings',
       ListView(
+        padding: const EdgeInsets.all(16),
         children: [
-          ListTile(
-            title: const TText('App language'),
-            subtitle: TText(
-              const {
-                    'en': 'English',
-                    'zh-Hans': '简体中文',
-                    'es': 'Español',
-                    'ja': '日本語',
-                    'de': 'Deutsch',
-                  }[store.get('language', 'en')] ??
-                  'English',
-            ),
-            onTap: () => open(c, const LanguagePicker()),
-          ),
-          ListTile(
-            title: const TText('Privacy Policy'),
-            onTap: () =>
-                open(c, const PolicyPage('Privacy Policy', 'privacy.txt')),
-          ),
-          ListTile(
-            title: const TText('Terms of Service'),
-            onTap: () =>
-                open(c, const PolicyPage('Terms of Service', 'terms.txt')),
-          ),
-          ListTile(
-            title: const TText('Community Guidelines'),
-            onTap: () => open(c, const Guidelines()),
-          ),
-          ListTile(
-            title: const TText('Blocked accounts'),
-            onTap: () => open(c, const Blocked()),
-          ),
-          ListTile(
-            title: const TText('About'),
-            subtitle: const TText('Toti · Android'),
-          ),
-          SwitchListTile(
-            title: const TText('Message do not disturb'),
-            value: store.get('messageDND', false),
-            onChanged: (v) => store.put('messageDND', v),
-          ),
-          SwitchListTile(
-            title: const TText('Call do not disturb'),
-            value: store.get('callDND', false),
-            onChanged: (v) => store.put('callDND', v),
-          ),
-          ListTile(
-            title: const TText('Sign out'),
-            onTap: () {
-              store.put('signedIn', false);
-              Navigator.popUntil(c, (r) => r.isFirst);
-            },
-          ),
-          ListTile(
-            title: const TText(
-              'Delete local account data',
-              style: TextStyle(color: Colors.redAccent),
-            ),
-            onTap: () => showDialog<void>(
-              context: c,
-              builder: (d) => AlertDialog(
-                title: const TText('Delete local account data?'),
-                content: const TText(
-                  'This removes profile, follows, messages and local activity from this device.',
+          card(
+            Column(
+              children: [
+                ListTile(
+                  leading: utilityArtwork(4),
+                  title: const TText('App language'),
+                  subtitle: TText(
+                    const {
+                          'en': 'English',
+                          'zh-Hans': '简体中文',
+                          'es': 'Español',
+                          'ja': '日本語',
+                          'de': 'Deutsch',
+                        }[store.get('language', 'en')] ??
+                        'English',
+                  ),
+                  trailing: actionArtwork(4, size: 18),
+                  onTap: () => open(c, const LanguagePicker()),
                 ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(d),
-                    child: const TText('Cancel'),
+                ListTile(
+                  leading: utilityArtwork(2),
+                  title: const TText('Privacy Policy'),
+                  trailing: actionArtwork(4, size: 18),
+                  onTap: () => open(
+                    c,
+                    const PolicyPage('Privacy Policy', 'privacy.txt'),
                   ),
-                  TextButton(
-                    onPressed: () async {
-                      try {
-                        for (final item in store.records('pending')) {
-                          final path = item['path'];
-                          if (path is String && await File(path).exists()) {
-                            await File(path).delete();
-                          }
-                        }
-                      } catch (_) {
-                        if (d.mounted) {
-                          notice(
-                            d,
-                            'Could not delete data',
-                            'Please try again.',
-                          );
-                        }
-                        return;
-                      }
-                      store.clear();
-                      if (d.mounted) Navigator.pop(d);
-                      if (c.mounted) Navigator.popUntil(c, (r) => r.isFirst);
-                    },
-                    child: const TText('Delete'),
+                ),
+                ListTile(
+                  leading: cardArtwork(2, size: 26),
+                  title: const TText('Terms of Service'),
+                  trailing: actionArtwork(4, size: 18),
+                  onTap: () => open(
+                    c,
+                    const PolicyPage('Terms of Service', 'terms.txt'),
                   ),
-                ],
-              ),
+                ),
+                ListTile(
+                  leading: utilityArtwork(2),
+                  title: const TText('Community Guidelines'),
+                  trailing: actionArtwork(4, size: 18),
+                  onTap: () => open(c, const Guidelines()),
+                ),
+                ListTile(
+                  leading: utilityArtwork(2),
+                  title: const TText('Blocked accounts'),
+                  trailing: actionArtwork(4, size: 18),
+                  onTap: () => open(c, const Blocked()),
+                ),
+                ListTile(
+                  leading: cardArtwork(3, size: 26),
+                  title: const TText('About'),
+                  subtitle: const TText('Toti · Android'),
+                ),
+                SwitchListTile(
+                  secondary: utilityArtwork(3),
+                  title: const TText('Message do not disturb'),
+                  value: store.get('messageDND', false),
+                  onChanged: (v) => store.put('messageDND', v),
+                ),
+                SwitchListTile(
+                  secondary: utilityArtwork(3),
+                  title: const TText('Call do not disturb'),
+                  value: store.get('callDND', false),
+                  onChanged: (v) => store.put('callDND', v),
+                ),
+                ListTile(
+                  title: const TText('Sign out'),
+                  trailing: actionArtwork(4, size: 18),
+                  onTap: () {
+                    store.put('signedIn', false);
+                    Navigator.popUntil(c, (r) => r.isFirst);
+                  },
+                ),
+                ListTile(
+                  leading: utilityArtwork(2),
+                  title: const TText(
+                    'Delete account data',
+                    style: TextStyle(color: Colors.redAccent),
+                  ),
+                  onTap: () => showDialog<void>(
+                    context: c,
+                    builder: (d) => AlertDialog(
+                      title: const TText('Delete account data?'),
+                      content: const TText(
+                        'This removes the profile, follows, messages and activity saved in this app.',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(d),
+                          child: const TText('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            try {
+                              for (final item in store.records('pending')) {
+                                final path = item['path'];
+                                if (path is String &&
+                                    await File(path).exists()) {
+                                  await File(path).delete();
+                                }
+                              }
+                            } catch (_) {
+                              if (d.mounted) {
+                                notice(
+                                  d,
+                                  'Could not delete data',
+                                  'Please try again.',
+                                );
+                              }
+                              return;
+                            }
+                            store.clear();
+                            if (d.mounted) Navigator.pop(d);
+                            if (c.mounted) {
+                              Navigator.popUntil(c, (r) => r.isFirst);
+                            }
+                          },
+                          child: const TText('Delete'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
+            padding: EdgeInsets.zero,
           ),
         ],
       ),
@@ -3771,16 +5896,22 @@ class Blocked extends StatelessWidget {
       return Screen(
         'Blocked accounts',
         blocked.isEmpty
-            ? const Center(child: TText('Your blocked list is empty.'))
+            ? emptyState('Your blocked list is empty.', artwork: 2)
             : ListView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 children: [
                   for (final m in blocked)
-                    ListTile(
-                      leading: avatar(m.image),
-                      title: TText(m.name),
-                      trailing: TextButton(
-                        onPressed: () => store.toggle('blocked', m.id),
-                        child: const TText('Unblock'),
+                    listCard(
+                      ListTile(
+                        leading: avatar(m.image),
+                        title: TText(m.name),
+                        trailing: TextButton(
+                          onPressed: () => store.toggle('blocked', m.id),
+                          child: const TText('Unblock'),
+                        ),
                       ),
                     ),
                 ],
@@ -3798,7 +5929,7 @@ class Guidelines extends StatelessWidget {
     SingleChildScrollView(
       padding: EdgeInsets.all(18),
       child: TText(
-        'Be real and be respectful\nUse an authentic identity. Do not impersonate others or manipulate follows.\n\nConsent comes first\nMessages and calls require mutual follow. Never pressure someone to follow, reply, meet or share private information.\n\nKeep people safe\nNo bullying, threats, hate speech, sexual exploitation, graphic violence, scams, spam or promotion of dangerous activity.\n\nProtect privacy\nDo not publish another person’s private information, intimate media or location without permission.\n\nUse safety tools\nReport content that violates these rules. Block a person when you do not want to see their profile, content or conversations. Reports and blocks hide affected content on this device.',
+        'Be real and be respectful\nUse an authentic identity. Do not impersonate others or manipulate follows.\n\nConsent comes first\nMessages and calls require mutual follow. Never pressure someone to follow, reply, meet or share private information.\n\nKeep people safe\nNo bullying, threats, hate speech, sexual exploitation, graphic violence, scams, spam or promotion of dangerous activity.\n\nProtect privacy\nDo not publish another person’s private information, intimate media or location without permission.\n\nUse safety tools\nReport content that violates these rules. Block a person when you do not want to see their profile, content or conversations. Reports and blocks hide affected content from your view; reports are not sent to a moderation service.',
       ),
     ),
   );
@@ -3836,7 +5967,7 @@ class _LiveSetupState extends State<LiveSetup> {
         header('Open a live conversation'),
         const SizedBox(height: 8),
         const TText(
-          'Preview your camera and microphone locally. No broadcast service is connected.',
+          'Preview your camera and microphone. No broadcast service is connected.',
           style: TextStyle(color: muted),
         ),
         const SizedBox(height: 20),
@@ -3846,7 +5977,7 @@ class _LiveSetupState extends State<LiveSetup> {
           decoration: const InputDecoration(labelText: 'Live title'),
         ),
         const SizedBox(height: 20),
-        action('Start local preview', () {
+        action('Start preview', () {
           final t = title.text.trim();
           if (t.length < 3 || !allowed(t)) {
             notice(
@@ -3943,7 +6074,7 @@ class _CreatorPreviewState extends State<CreatorPreview>
 
   @override
   Widget build(BuildContext c) => Screen(
-    'Local preview',
+    'Camera preview',
     Stack(
       fit: StackFit.expand,
       children: [
@@ -3972,7 +6103,7 @@ class _CreatorPreviewState extends State<CreatorPreview>
                   ),
                 ),
                 const SizedBox(height: 8),
-                const TText('Local preview only · not broadcasting'),
+                const TText('Preview only · not broadcasting'),
                 if (error != null)
                   TextButton(onPressed: start, child: const TText('Try again')),
               ],
@@ -3990,6 +6121,7 @@ class LanguagePicker extends StatelessWidget {
   Widget build(BuildContext c) => Screen(
     'Choose your language',
     ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       children: [
         for (final entry in const {
           'en': 'English',
@@ -3998,14 +6130,17 @@ class LanguagePicker extends StatelessWidget {
           'ja': '日本語',
           'de': 'Deutsch',
         }.entries)
-          ListTile(
-            title: Text(entry.value),
-            trailing: store.get('language', 'en') == entry.key
-                ? const TText('Selected')
-                : null,
-            onTap: () {
-              store.put('language', entry.key);
-            },
+          listCard(
+            ListTile(
+              leading: utilityArtwork(4),
+              title: Text(entry.value),
+              trailing: store.get('language', 'en') == entry.key
+                  ? const TText('Selected')
+                  : null,
+              onTap: () {
+                store.put('language', entry.key);
+              },
+            ),
           ),
       ],
     ),

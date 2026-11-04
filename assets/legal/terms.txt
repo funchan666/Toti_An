@@ -14,13 +14,13 @@ Community and safety
 Use the available reporting and blocking controls when appropriate. In the current version these controls are stored on the device; reports are not transmitted to a moderation service. Bundled profiles and media are examples, and conversations are not delivered to other people.
 
 Availability of features
-Features may change or be unavailable. The current camera preview is local and is not a live broadcast. Voice and video calling are not connected. Do not rely on Toti for emergency communication.
+Features may change or be unavailable. The current camera preview is not a live broadcast. Voice and video calling are not connected. Do not rely on Toti for emergency communication.
 
 Coins and purchases
 Toti may display virtual coins and effects. Current coin balances and effects are stored on the device. Google Play purchasing is not yet enabled; if enabled later, the product, price and applicable purchase terms will be shown before purchase. Virtual items are not cash and cannot be exchanged for cash through the app.
 
 Account controls
-You can sign out or delete locally stored account data through Settings. Data removed from your device may not be recoverable.
+You can sign out or delete stored account data through Settings. Data removed from your device may not be recoverable.
 
 Changes and availability
 The app and these terms may be updated over time. Use of the app after an update is subject to the terms made available at that time, to the extent permitted by applicable law.

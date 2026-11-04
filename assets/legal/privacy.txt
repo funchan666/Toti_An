@@ -17,7 +17,7 @@ Storage and deletion
 App data and submitted media are kept on your device. You can delete stored account data in Settings. Uninstalling the app may also remove app-managed data, subject to your device and backup settings. Deletion cannot remove copies you created outside the app.
 
 Sharing and external services
-The current app does not send profile entries, local messages or reports to a Toti server. Opening an external link may connect you to the linked service, which has its own privacy practices. If Google Play billing is enabled, Google processes the purchase under its own policies; Toti's policy must be updated to reflect the implemented purchase flow.
+The current app does not send profile entries, messages or reports to a Toti server. Opening an external link may connect you to the linked service, which has its own privacy practices. If Google Play billing is enabled, Google processes the purchase under its own policies; Toti's policy must be updated to reflect the implemented purchase flow.
 
 Children
 Toti is intended for adults aged 18 and over. Do not use it if you are under 18.

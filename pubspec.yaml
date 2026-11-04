@@ -30,6 +30,9 @@ flutter:
     - assets/legal/
     - assets/data/
     - assets/portraits/
+    - assets/portraits/reel-stills/
+    - assets/portraits/room-stills/
+    - assets/portraits/moment-stills/
     - assets/videos/
     - assets/art/
   fonts:
