@@ -1,0 +1,32 @@
+Toti Privacy Policy
+Draft for review · November 4, 2026
+
+About this policy
+This draft describes the Android version of Toti as currently implemented. It should be updated before release if features, providers, data practices or contact details change.
+
+Information you provide
+Toti lets you enter profile details, messages, comments, room details and reports, and select or capture photos and videos. The app stores these choices and related activity on your device. Bundled example profiles and content are included with the app.
+
+Camera, microphone and media
+If you choose camera preview, capture or the room microphone, Android may ask for camera or microphone permission. If you select a photo or video, the app receives the item you choose. When you choose “Use my region,” the app requests location access and uses your location with the Android geocoding service to determine a discovery region. The operating system or geocoding provider may process that request under its own policies. You can manage permissions in Android settings. Camera preview and the room microphone do not transmit audio or video to other people.
+
+How information is used
+The app uses your entries to display your profile and activity, maintain follows, messages and preferences, and support the features you choose. Reports and blocks affect content on your device; reports are not currently sent to a moderation service.
+
+Storage and deletion
+App data and submitted media are kept on your device. You can delete stored account data in Settings. Uninstalling the app may also remove app-managed data, subject to your device and backup settings. Deletion cannot remove copies you created outside the app.
+
+Sharing and external services
+The current app does not send profile entries, local messages or reports to a Toti server. Opening an external link may connect you to the linked service, which has its own privacy practices. If Google Play billing is enabled, Google processes the purchase under its own policies; Toti's policy must be updated to reflect the implemented purchase flow.
+
+Children
+Toti is intended for adults aged 18 and over. Do not use it if you are under 18.
+
+Security
+Use a device lock and keep Android up to date. No method of storage or transmission can guarantee absolute security.
+
+Changes to this policy
+We may update this policy when the app or applicable requirements change. The current policy should be made available within the app.
+
+Contact
+Contact email:
