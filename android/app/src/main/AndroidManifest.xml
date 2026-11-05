@@ -7,7 +7,7 @@
     <application
         android:label="Toti"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@drawable/toti_app_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"

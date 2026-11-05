@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Modify this file to customize your launch splash screen -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="#0A0220" />
-
-    <!-- You can insert your own image assets here -->
-    <!-- <item>
-        <bitmap
-            android:gravity="center"
-            android:src="@mipmap/launch_image" />
-    </item> -->
+    <item android:drawable="#07020C" />
+    <item android:width="160dp" android:height="160dp" android:gravity="center">
+        <bitmap android:gravity="fill" android:src="@drawable/toti_app_icon" />
+    </item>
 </layer-list>
