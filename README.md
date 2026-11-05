@@ -1,6 +1,6 @@
 # Toti for Android
 
-Flutter Android application based on the LookMe iOS A-side. Original project media, fonts, sample profiles and editorial content are included. The B-side routing, WebSocket and remote WebView integration are excluded. The Android application ID remains `com.example.toti_an` as requested; configure the final ID and release signing before publishing.
+Flutter Android application based on the LookMe iOS A-side. Original project media, fonts, sample profiles and editorial content are included. The B-side routing, WebSocket and remote WebView integration are excluded. The Android application ID is `com.toticonnect.meetcommunity`; configure release signing before publishing.
 
 ## Implemented locally
 
@@ -10,8 +10,8 @@ Example profiles, videos and activity are bundled. Chat, reports, room activity 
 
 ## Outstanding
 
-This is not yet a complete or visually verified one-to-one port. LookMe's Apple sign-in and email flow, some room and activity details, speaker routing, complete translation coverage, and the exact original visual treatment still differ. No connected communication or moderation service exists in the A-side project to port. Toti's Google Play checkout is disabled until real product configuration, transaction verification, fulfillment and recovery exist. See `docs/GOOGLE_PLAY_PRODUCTS.md` for proposed IDs and reference prices.
+This is not yet a complete or visually verified one-to-one port. The email sign-in and registration screens are previews: they validate input but do not create accounts, verify credentials, or store the submitted email or password. No connected authentication, communication or moderation service exists in the A-side project to port. Some room and activity details, speaker routing, complete translation coverage, and the exact original visual treatment still differ. Toti's Google Play checkout is disabled until real product configuration, transaction verification, fulfillment and recovery exist. See `docs/GOOGLE_PLAY_PRODUCTS.md` for proposed IDs and reference prices.
 
-The two bundled policies are drafts, and corresponding editable drafts have been created in Google Drive. The email is intentionally blank. Before release, establish a privacy contact and publish a suitable publicly accessible, non-editable policy URL; review and update the drafts to match the final features, services and data practices. The currently observed Google Play developer account was removed and cannot publish apps.
+The policy drafts remain in the repository and Google Drive, but are not bundled into the app. Both policy screens load public HTTPS pages in a WebView: `https://toti-terms-privacy.aqua-fly-0681.chatgpt.site/terms` and `https://toti-terms-privacy.aqua-fly-0681.chatgpt.site/privacy`. These defaults may be overridden at build time using `--dart-define=TOTI_TERMS_URL=https://...` and `--dart-define=TOTI_PRIVACY_URL=https://...`. The published pages are separate copies, not automatically synchronized with the Google Drive drafts. The pages are review drafts; before release, establish a privacy contact and update them to match the final features, services and data practices. The currently observed Play developer account was removed and cannot publish apps.
 
 Before the UI refinement, an Android ARM64 debug APK was built and run on an Android 14 emulator. Login, video display, room entry and a local room message, and the daily coin reward were checked on the emulator; eight Flutter tests passed. The UI refinement has not yet been built or run. The app requires Android 7.0 (API 24) or later. A physical device, pixel-by-pixel comparison, release build, Google Play purchase, camera and microphone capture, and live services were not verified.

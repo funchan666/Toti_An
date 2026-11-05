@@ -48,13 +48,24 @@ void main() {
     await tester.pumpWidget(const app.TotiApp());
     await tester.pumpAndSettle();
     expect(label('Toti'), findsOneWidget);
-    await tester.tap(label('Quick login'));
+    await tester.enterText(
+      find.byKey(const ValueKey('auth-email')),
+      'demo@example.com',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('auth-password')),
+      'example123',
+    );
+    await tester.ensureVisible(label('Continue in preview'));
+    await tester.tap(label('Continue in preview'));
     await tester.pumpAndSettle();
     expect(label('Agree to continue'), findsOneWidget);
     await tester.tap(label('OK'));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('accept-terms')));
     await tester.tap(find.byKey(const ValueKey('accept-terms')));
-    await tester.tap(label('Quick login'));
+    await tester.ensureVisible(label('Continue in preview'));
+    await tester.tap(label('Continue in preview'));
     await tester.pumpAndSettle();
     expect(label('Welcome to Toti'), findsOneWidget);
     expect(app.store.get('coins', 0), 888);
@@ -211,7 +222,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(app.store.get('signedIn', false), false);
     expect(app.store.get('coins', 0), 0);
-    expect(label('Quick login'), findsOneWidget);
+    expect(label('Continue in preview'), findsOneWidget);
     await tester.pump(const Duration(seconds: 25));
     await tester.pumpWidget(const SizedBox());
   });

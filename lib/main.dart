@@ -9,7 +9,17 @@ import 'package:image_picker/image_picker.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'store.dart';
+
+const termsUrl = String.fromEnvironment(
+  'TOTI_TERMS_URL',
+  defaultValue: 'https://toti-terms-privacy.aqua-fly-0681.chatgpt.site/terms',
+);
+const privacyUrl = String.fromEnvironment(
+  'TOTI_PRIVACY_URL',
+  defaultValue: 'https://toti-terms-privacy.aqua-fly-0681.chatgpt.site/privacy',
+);
 
 const bg = Color(0xff0a0220),
     panel = Color(0xff18083c),
@@ -283,6 +293,15 @@ Widget inboxArtwork(int index, {double size = 36}) => ExcludeSemantics(
 Widget memberActionArtwork(int index, {double size = 26}) => ExcludeSemantics(
   child: spriteArtwork('assets/art/toti-member-actions.png', index, size: size),
 );
+Widget authArtwork(int index, {double size = 24}) => ExcludeSemantics(
+  child: spriteArtwork('assets/art/toti-auth-icons.png', index, size: size),
+);
+Widget coinPackArtwork(int index, {double size = 44}) => ExcludeSemantics(
+  child: spriteArtwork('assets/art/toti-coin-packs.png', index, size: size),
+);
+Widget callArtwork(int index, {double size = 28}) => ExcludeSemantics(
+  child: spriteArtwork('assets/art/toti-call-icons.png', index, size: size),
+);
 Widget iconLabel(Widget icon, String label) => Row(
   mainAxisSize: MainAxisSize.min,
   children: [icon, const SizedBox(width: 6), TText(label)],
@@ -410,90 +429,307 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   bool accepted = false;
+  bool registering = false;
+  bool showPassword = false;
+  final formKey = GlobalKey<FormState>();
+  final email = TextEditingController();
+  final password = TextEditingController();
+  final confirmation = TextEditingController();
+
+  @override
+  void dispose() {
+    email.dispose();
+    password.dispose();
+    confirmation.dispose();
+    super.dispose();
+  }
+
+  void switchMode(bool value) {
+    if (registering == value) return;
+    FocusScope.of(context).unfocus();
+    password.clear();
+    confirmation.clear();
+    setState(() {
+      registering = value;
+      showPassword = false;
+    });
+  }
+
+  void enterPreview() {
+    if (!formKey.currentState!.validate()) return;
+    if (!accepted) {
+      notice(
+        context,
+        'Agree to continue',
+        'Please review and accept the Terms of Service and Privacy Policy.',
+      );
+      return;
+    }
+    FocusScope.of(context).unfocus();
+    email.clear();
+    password.clear();
+    confirmation.clear();
+    store.login();
+  }
+
+  InputDecoration authDecoration(String label, int artwork) => InputDecoration(
+    labelText: tr(label),
+    prefixIcon: Padding(
+      padding: const EdgeInsets.all(14),
+      child: authArtwork(artwork, size: 24),
+    ),
+    fillColor: const Color(0xff24163a),
+    labelStyle: const TextStyle(color: Color(0xffd8c4df)),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: BorderSide.none,
+    ),
+  );
+
   @override
   Widget build(BuildContext c) => Scaffold(
+    resizeToAvoidBottomInset: true,
     body: SafeArea(
       child: Stack(
         fit: StackFit.expand,
         children: [
           Image.asset('assets/art/account-entry-scene.png', fit: BoxFit.cover),
-          Container(color: Colors.black.withValues(alpha: .48)),
-          Padding(
-            padding: const EdgeInsets.all(26),
-            child: Column(
-              children: [
-                const Spacer(),
-                header('Toti'),
-                const SizedBox(height: 8),
-                const TText(
-                  'Find your people. Share your moments.',
-                  textAlign: TextAlign.center,
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0x8a10071c),
+                  Color(0xf20e061e),
+                  Color(0xff0a0220),
+                ],
+                stops: [0, .46, 1],
+              ),
+            ),
+          ),
+          LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: const EdgeInsets.fromLTRB(24, 22, 24, 24),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: (constraints.maxHeight - 46).clamp(
+                    0,
+                    double.infinity,
+                  ),
                 ),
-                const Spacer(),
-                SizedBox(
-                  width: double.infinity,
-                  child: action('Quick login', () {
-                    if (!accepted) {
-                      notice(
-                        c,
-                        'Agree to continue',
-                        'Please review and accept the Terms of Service and Privacy Policy.',
-                      );
-                      return;
-                    }
-                    store.login();
-                  }, primary: true),
-                ),
-                const SizedBox(height: 12),
-                Row(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Semantics(
-                      label: tr(
-                        'I am 18 or older and agree to the Terms of Service and Privacy Policy.',
-                      ),
-                      checked: accepted,
-                      child: InkWell(
-                        key: const ValueKey('accept-terms'),
-                        onTap: () => setState(() => accepted = !accepted),
-                        child: SizedBox(
-                          width: 48,
-                          height: 48,
-                          child: Center(
-                            child: controlArtwork(accepted ? 1 : 2, size: 28),
-                          ),
-                        ),
+                    const SizedBox(height: 14),
+                    const TText(
+                      'Toti',
+                      style: TextStyle(
+                        fontFamily: 'SpaceGrotesk',
+                        fontSize: 34,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
                       ),
                     ),
-                    Expanded(
-                      child: Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
+                    const SizedBox(height: 5),
+                    const TText(
+                      'Find your people. Share your moments.',
+                      style: TextStyle(color: Color(0xffeee1ea), fontSize: 14),
+                    ),
+                    SizedBox(
+                      height: (constraints.maxHeight * .08).clamp(24.0, 60.0),
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: authTab(
+                            'Sign in',
+                            !registering,
+                            () => switchMode(false),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: authTab(
+                            'Register',
+                            registering,
+                            () => switchMode(true),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const TText(
+                      'Preview only: no account is created. Email and password are not verified or saved.',
+                      style: TextStyle(
+                        color: Color(0xffe3cfe0),
+                        fontSize: 12,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Form(
+                      key: formKey,
+                      child: Column(
                         children: [
-                          const TText('I am 18 or older and agree to the '),
-                          TextButton(
-                            style: linkStyle,
-                            onPressed: () => open(
-                              c,
-                              const PolicyPage('Terms of Service', 'terms.txt'),
-                            ),
-                            child: const TText('Terms of Service'),
+                          TextFormField(
+                            key: const ValueKey('auth-email'),
+                            controller: email,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            autofillHints: const [],
+                            autocorrect: false,
+                            enableSuggestions: false,
+                            decoration: authDecoration('Email address', 0),
+                            validator: (value) {
+                              final address = (value ?? '').trim();
+                              final valid = RegExp(
+                                r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$',
+                              ).hasMatch(address);
+                              return valid && !address.contains('..')
+                                  ? null
+                                  : tr('Enter a valid email address.');
+                            },
                           ),
-                          const TText(' and '),
-                          TextButton(
-                            style: linkStyle,
-                            onPressed: () => open(
-                              c,
-                              const PolicyPage('Privacy Policy', 'privacy.txt'),
-                            ),
-                            child: const TText('Privacy Policy'),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            key: const ValueKey('auth-password'),
+                            controller: password,
+                            obscureText: !showPassword,
+                            enableSuggestions: false,
+                            autocorrect: false,
+                            autofillHints: const [],
+                            textInputAction: registering
+                                ? TextInputAction.next
+                                : TextInputAction.done,
+                            onFieldSubmitted: (_) {
+                              if (!registering) enterPreview();
+                            },
+                            decoration:
+                                authDecoration(
+                                  'Password (6+ characters)',
+                                  1,
+                                ).copyWith(
+                                  suffixIcon: IconButton(
+                                    tooltip: tr(
+                                      showPassword
+                                          ? 'Hide password'
+                                          : 'Show password',
+                                    ),
+                                    onPressed: () => setState(
+                                      () => showPassword = !showPassword,
+                                    ),
+                                    icon: authArtwork(
+                                      showPassword ? 3 : 2,
+                                      size: 23,
+                                    ),
+                                  ),
+                                ),
+                            validator: (value) => (value ?? '').length >= 6
+                                ? null
+                                : tr('Use at least 6 characters.'),
                           ),
+                          if (registering) ...[
+                            const SizedBox(height: 12),
+                            TextFormField(
+                              key: const ValueKey('auth-confirmation'),
+                              controller: confirmation,
+                              obscureText: !showPassword,
+                              enableSuggestions: false,
+                              autocorrect: false,
+                              autofillHints: const [],
+                              textInputAction: TextInputAction.done,
+                              onFieldSubmitted: (_) => enterPreview(),
+                              decoration: authDecoration('Confirm password', 1),
+                              validator: (value) => value == password.text
+                                  ? null
+                                  : tr('Passwords do not match.'),
+                            ),
+                          ],
                         ],
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: enterPreview,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: pink,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(48, 52),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const TText('Continue in preview'),
+                            const SizedBox(width: 8),
+                            authArtwork(4, size: 22),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Semantics(
+                          label: tr(
+                            'I am 18 or older and agree to the Terms of Service and Privacy Policy.',
+                          ),
+                          checked: accepted,
+                          child: InkWell(
+                            key: const ValueKey('accept-terms'),
+                            onTap: () => setState(() => accepted = !accepted),
+                            child: SizedBox(
+                              width: 48,
+                              height: 48,
+                              child: Center(
+                                child: controlArtwork(
+                                  accepted ? 1 : 2,
+                                  size: 28,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              const TText('I am 18 or older and agree to the '),
+                              TextButton(
+                                style: linkStyle,
+                                onPressed: () => open(
+                                  c,
+                                  const PolicyPage(
+                                    'Terms of Service',
+                                    termsUrl,
+                                  ),
+                                ),
+                                child: const TText('Terms of Service'),
+                              ),
+                              const TText(' and '),
+                              TextButton(
+                                style: linkStyle,
+                                onPressed: () => open(
+                                  c,
+                                  const PolicyPage(
+                                    'Privacy Policy',
+                                    privacyUrl,
+                                  ),
+                                ),
+                                child: const TText('Privacy Policy'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-                const SizedBox(height: 20),
-              ],
+              ),
             ),
           ),
         ],
@@ -502,36 +738,192 @@ class _LoginState extends State<Login> {
   );
 }
 
-class PolicyPage extends StatelessWidget {
-  final String title, file;
-  const PolicyPage(this.title, this.file, {super.key});
+Widget authTab(String label, bool selected, VoidCallback onTap) => TextButton(
+  onPressed: onTap,
+  style: TextButton.styleFrom(
+    minimumSize: const Size(48, 46),
+    backgroundColor: selected
+        ? const Color(0xff63316b)
+        : const Color(0x99301c3e),
+    foregroundColor: selected ? Colors.white : const Color(0xffd4c4d2),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+  ),
+  child: TText(label),
+);
+
+class PolicyPage extends StatefulWidget {
+  final String title, url;
+  const PolicyPage(this.title, this.url, {super.key});
   @override
-  Widget build(BuildContext c) => Screen(
-    title,
-    FutureBuilder<String>(
-      future: DefaultAssetBundle.of(c).loadString('assets/legal/$file'),
-      builder: (c, result) {
-        if (result.hasError) {
-          return const Center(child: TText('Unable to open this policy.'));
-        }
-        if (!result.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final sections = result.data!.trim().split('\n\n');
-        return ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            for (final section in sections)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20),
-                child: TText(
-                  section,
-                  style: const TextStyle(fontSize: 15, height: 1.5),
+  State<PolicyPage> createState() => _PolicyPageState();
+}
+
+class _PolicyPageState extends State<PolicyPage> {
+  WebViewController? controller;
+  Uri? policyUri;
+  String? currentUrl;
+  bool loading = false;
+  bool failed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final uri = Uri.tryParse(widget.url);
+    if (uri != null && uri.scheme == 'https' && uri.host.isNotEmpty) {
+      policyUri = uri;
+      loading = true;
+      initializeWebView(uri);
+    }
+  }
+
+  Future<void> initializeWebView(Uri uri) async {
+    try {
+      final web = WebViewController();
+      await web.setJavaScriptMode(JavaScriptMode.unrestricted);
+      await web.setNavigationDelegate(
+        NavigationDelegate(
+          onNavigationRequest: (request) {
+            if (Uri.tryParse(request.url)?.scheme == 'https') {
+              return NavigationDecision.navigate;
+            }
+            if (request.isMainFrame && mounted) {
+              setState(() {
+                failed = true;
+                loading = false;
+              });
+            }
+            return NavigationDecision.prevent;
+          },
+          onPageStarted: (url) {
+            currentUrl = url;
+            if (mounted) {
+              setState(() {
+                loading = true;
+                failed = false;
+              });
+            }
+          },
+          onPageFinished: (_) {
+            if (mounted) setState(() => loading = false);
+          },
+          onWebResourceError: (error) {
+            if (mounted && error.isForMainFrame == true) {
+              setState(() {
+                failed = true;
+                loading = false;
+              });
+            }
+          },
+          onHttpError: (error) {
+            if (mounted &&
+                currentUrl != null &&
+                error.request?.uri.toString() == currentUrl) {
+              setState(() {
+                failed = true;
+                loading = false;
+              });
+            }
+          },
+        ),
+      );
+      if (!mounted) return;
+      setState(() => controller = web);
+      await web.loadRequest(uri);
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          failed = true;
+          loading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> retry() async {
+    if (policyUri == null) return;
+    setState(() {
+      failed = false;
+      loading = true;
+    });
+    try {
+      if (controller == null) {
+        await initializeWebView(policyUri!);
+      } else {
+        await controller!.loadRequest(policyUri!);
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          failed = true;
+          loading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> back() async {
+    if (controller != null && !failed && await controller!.canGoBack()) {
+      await controller!.goBack();
+      return;
+    }
+    if (mounted) Navigator.maybePop(context);
+  }
+
+  @override
+  Widget build(BuildContext c) => Scaffold(
+    body: SafeArea(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 6, 16, 8),
+            child: Row(
+              children: [
+                memberIconButton(label: 'Back', artwork: 0, onTap: back),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TText(
+                    widget.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
-              ),
-          ],
-        );
-      },
+              ],
+            ),
+          ),
+          Expanded(
+            child: policyUri == null
+                ? const Center(
+                    child: TText('This policy is currently unavailable.'),
+                  )
+                : failed
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const TText('Unable to open this policy.'),
+                        const SizedBox(height: 12),
+                        TextButton(
+                          onPressed: retry,
+                          child: const TText('Try again'),
+                        ),
+                      ],
+                    ),
+                  )
+                : Stack(
+                    children: [
+                      if (controller != null)
+                        WebViewWidget(controller: controller!),
+                      if (loading)
+                        const Center(child: CircularProgressIndicator()),
+                    ],
+                  ),
+          ),
+        ],
+      ),
     ),
   );
 }
@@ -1361,6 +1753,18 @@ class MemberPage extends StatelessWidget {
                     },
                   ),
                 ),
+                const SizedBox(width: 8),
+                memberCallButton(
+                  label: 'Voice call',
+                  artwork: 0,
+                  onTap: () => openMemberCall(c, member, video: false),
+                ),
+                const SizedBox(width: 8),
+                memberCallButton(
+                  label: 'Video call',
+                  artwork: 1,
+                  onTap: () => openMemberCall(c, member, video: true),
+                ),
               ],
             ),
           ),
@@ -1369,6 +1773,47 @@ class MemberPage extends StatelessWidget {
     },
   );
 }
+
+void openMemberCall(
+  BuildContext context,
+  Member member, {
+  required bool video,
+}) {
+  if (!store.mutual(member)) {
+    notice(
+      context,
+      'Mutual follow required',
+      'Both people must follow each other.',
+    );
+    return;
+  }
+  open(context, CallPreview(member, video: video));
+}
+
+Widget memberCallButton({
+  required String label,
+  required int artwork,
+  required VoidCallback onTap,
+}) => Tooltip(
+  message: tr(label),
+  child: Semantics(
+    button: true,
+    label: tr(label),
+    child: Material(
+      color: const Color(0xff38204d),
+      borderRadius: BorderRadius.circular(17),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(17),
+        onTap: onTap,
+        child: SizedBox(
+          width: 50,
+          height: 54,
+          child: Center(child: callArtwork(artwork, size: 30)),
+        ),
+      ),
+    ),
+  ),
+);
 
 Widget memberIconButton({
   required String label,
@@ -5424,6 +5869,19 @@ const coinProducts = <String, int>{
   'toti_coins_115000': 115000,
 };
 
+// Reference values from LookMe; Google Play determines the actual price.
+const coinReferencePrices = <String, String>{
+  'toti_coins_500': 'USD 0.99',
+  'toti_coins_1050': 'USD 1.99',
+  'toti_coins_1650': 'USD 2.99',
+  'toti_coins_2900': 'USD 4.99',
+  'toti_coins_6000': 'USD 9.99',
+  'toti_coins_12500': 'USD 19.99',
+  'toti_coins_33000': 'USD 49.99',
+  'toti_coins_72000': 'USD 99.99',
+  'toti_coins_115000': 'USD 149.99',
+};
+
 class Vault extends StatefulWidget {
   const Vault({super.key});
   @override
@@ -5431,51 +5889,47 @@ class Vault extends StatefulWidget {
 }
 
 class _VaultState extends State<Vault> {
-  bool loading = true;
-  String? error;
-  List<ProductDetails> products = [];
-  @override
-  void initState() {
-    super.initState();
-    load();
-  }
+  String? checking;
+  final Map<String, String> prices = {};
 
-  Future<void> load() async {
+  Future<void> checkProduct(String id) async {
+    if (checking != null) return;
     setState(() {
-      loading = true;
-      error = null;
+      checking = id;
+      prices.remove(id);
     });
     try {
       if (!await InAppPurchase.instance.isAvailable()) {
         if (mounted) {
-          setState(() {
-            loading = false;
-            error = 'Google Play is unavailable.';
-          });
+          notice(
+            context,
+            'Google Play is unavailable',
+            'Please check Google Play and try again.',
+          );
         }
         return;
       }
-      final response = await InAppPurchase.instance.queryProductDetails(
-        coinProducts.keys.toSet(),
-      );
+      final response = await InAppPurchase.instance.queryProductDetails({id});
       if (!mounted) return;
-      setState(() {
-        loading = false;
-        products = response.productDetails
-          ..sort((a, b) => coinProducts[a.id]!.compareTo(coinProducts[b.id]!));
-        error =
-            response.error?.message ??
-            (products.isEmpty
-                ? 'Coin packs are not available in this Play account.'
-                : null);
-      });
+      final product = response.productDetails
+          .where((p) => p.id == id)
+          .firstOrNull;
+      if (response.error != null || product == null) {
+        notice(
+          context,
+          'Coin pack unavailable',
+          'This coin pack is not available from Google Play right now.',
+        );
+        return;
+      }
+      setState(() => prices[id] = product.price);
+      notice(context, 'Purchases unavailable', 'Purchases are not set up yet.');
     } catch (_) {
       if (mounted) {
-        setState(() {
-          loading = false;
-          error = 'Unable to load coin packs. Please try again.';
-        });
+        notice(context, 'Unable to check coin pack', 'Please try again.');
       }
+    } finally {
+      if (mounted) setState(() => checking = null);
     }
   }
 
@@ -5483,69 +5937,276 @@ class _VaultState extends State<Vault> {
   Widget build(BuildContext c) => Screen(
     'Coin Vault',
     ListView(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
       children: [
-        card(
-          Row(
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          decoration: BoxDecoration(
+            color: const Color(0xff3b1957),
+            borderRadius: BorderRadius.circular(22),
+          ),
+          child: Row(
             children: [
+              coinPackArtwork(4, size: 76),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const TText('YOUR BALANCE'),
+                    const TText(
+                      'Your balance',
+                      style: TextStyle(color: Color(0xffe3c9e4), fontSize: 12),
+                    ),
+                    const SizedBox(height: 3),
                     TText(
-                      '${store.get('coins', 0)} coins',
+                      '${store.get('coins', 0)}',
                       style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
+                        fontFamily: 'SpaceGrotesk',
+                        fontSize: 30,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
                       ),
+                    ),
+                    const TText(
+                      'Coins',
+                      style: TextStyle(color: Color(0xfff4cce5), fontSize: 12),
                     ),
                   ],
                 ),
               ),
-              cardArtwork(0, size: 54),
             ],
           ),
         ),
-        const SizedBox(height: 20),
-        header('Add coins'),
-        const SizedBox(height: 8),
-        if (loading)
-          const Center(
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: CircularProgressIndicator(),
-            ),
-          )
-        else if (error != null) ...[
-          TText(error!, style: const TextStyle(color: muted)),
-          TextButton(onPressed: load, child: const TText('Try again')),
-        ] else ...[
-          for (final p in products)
-            listCard(
-              ListTile(
-                leading: cardArtwork(0),
-                title: TText('${coinProducts[p.id]} coins'),
-                subtitle: TText(p.price),
-                trailing: TextButton(
-                  onPressed: () => notice(
-                    c,
-                    'Purchases unavailable',
-                    'Purchase verification is not configured yet.',
-                  ),
-                  child: const TText('Unavailable'),
-                ),
-              ),
-            ),
-        ],
-        const SizedBox(height: 18),
+        const SizedBox(height: 22),
         const TText(
-          'Coins can be used for gifts and effects. Messaging and following do not use coins.',
+          'Choose a coin pack',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 5),
+        const TText(
+          'Purchases are not set up yet.',
+          style: TextStyle(color: Color(0xffc8b5d1), fontSize: 12),
+        ),
+        const SizedBox(height: 6),
+        const TText(
+          'Reference prices are in USD. Google Play prices may vary.',
+          style: TextStyle(color: Color(0xffe1c4da), fontSize: 12),
+        ),
+        const SizedBox(height: 6),
+        const TText(
+          'Coins are used for gifts and effects. See the guide below.',
+          style: TextStyle(color: Color(0xffc8b5d1), fontSize: 12),
+        ),
+        const SizedBox(height: 14),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth < 300
+                ? constraints.maxWidth
+                : (constraints.maxWidth - 10) / 2;
+            return Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                for (final entry in coinProducts.entries)
+                  SizedBox(
+                    width: width,
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 148),
+                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xff1b0c38),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: const Color(0xff47235e)),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              coinPackArtwork(
+                                entry.value < 1650
+                                    ? 0
+                                    : entry.value < 6000
+                                    ? 1
+                                    : entry.value < 33000
+                                    ? 2
+                                    : entry.value < 115000
+                                    ? 3
+                                    : 4,
+                                size: 46,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${entry.value}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontFamily: 'SpaceGrotesk',
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const TText(
+                                      'Coins',
+                                      style: TextStyle(
+                                        color: Color(0xffd7c3dc),
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            prices[entry.key] ??
+                                coinReferencePrices[entry.key]!,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Color(0xffffd6ea),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          TText(
+                            prices.containsKey(entry.key)
+                                ? 'Google Play price'
+                                : 'Reference price',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Color(0xffcfbbd4),
+                              fontSize: 11,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          SizedBox(
+                            width: double.infinity,
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: const Color(0xff382052),
+                                minimumSize: const Size(0, 40),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 8,
+                                ),
+                              ),
+                              onPressed: checking == null
+                                  ? () => checkProduct(entry.key)
+                                  : null,
+                              child: TText(
+                                checking == entry.key
+                                    ? 'Checking…'
+                                    : 'Check price',
+                                maxLines: 2,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 24),
+        const TText(
+          'How coins are used',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+          decoration: BoxDecoration(
+            color: const Color(0xff190d30),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Column(
+            children: [
+              coinUseRow(
+                giftArtwork(0, size: 34),
+                'Example room gifts',
+                '25–520 coins each',
+                'Example gifts are not delivered to another person.',
+              ),
+              coinUseRow(
+                cardArtwork(3, size: 30),
+                'Boutique items',
+                '25–680 coins each',
+                'Collected items are added to your Backpack.',
+              ),
+              coinUseRow(
+                actionArtwork(1, size: 29),
+                'Messages, comments and follows',
+                'No coins required',
+                'These actions do not use coins.',
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        const TText(
+          'Coins are virtual items and cannot be exchanged for cash.',
+          style: TextStyle(color: Color(0xffb9a7c4), fontSize: 12, height: 1.4),
         ),
       ],
     ),
   );
 }
+
+Widget coinUseRow(Widget icon, String title, String cost, String description) =>
+    Padding(
+      padding: const EdgeInsets.symmetric(vertical: 11),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(width: 38, height: 38, child: Center(child: icon)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TText(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                TText(
+                  cost,
+                  style: const TextStyle(
+                    color: Color(0xffffa7d9),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                TText(
+                  description,
+                  style: const TextStyle(
+                    color: Color(0xffc9b8d1),
+                    fontSize: 12,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
 
 const effects = [
   ['rose', 'Rose Signal', 25, 'Live Gift'],
@@ -5773,19 +6434,15 @@ class Settings extends StatelessWidget {
                   leading: utilityArtwork(2),
                   title: const TText('Privacy Policy'),
                   trailing: actionArtwork(4, size: 18),
-                  onTap: () => open(
-                    c,
-                    const PolicyPage('Privacy Policy', 'privacy.txt'),
-                  ),
+                  onTap: () =>
+                      open(c, const PolicyPage('Privacy Policy', privacyUrl)),
                 ),
                 ListTile(
                   leading: cardArtwork(2, size: 26),
                   title: const TText('Terms of Service'),
                   trailing: actionArtwork(4, size: 18),
-                  onTap: () => open(
-                    c,
-                    const PolicyPage('Terms of Service', 'terms.txt'),
-                  ),
+                  onTap: () =>
+                      open(c, const PolicyPage('Terms of Service', termsUrl)),
                 ),
                 ListTile(
                   leading: utilityArtwork(2),

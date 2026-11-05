@@ -1,4 +1,4 @@
-package com.example.toti_an
+package com.toticonnect.meetcommunity
 
 import io.flutter.embedding.android.FlutterActivity
 
