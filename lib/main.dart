@@ -1133,15 +1133,90 @@ class _ShellState extends State<Shell> {
         store.put('welcomeShown', true);
         showDialog<void>(
           context: context,
-          builder: (c) => AlertDialog(
-            title: const TText('Welcome to Toti'),
-            content: const TText('Your first login gift: 888 coins.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(c),
-                child: const TText('Continue'),
+          builder: (c) => Dialog(
+            backgroundColor: const Color(0xff1b0b36),
+            insetPadding: const EdgeInsets.symmetric(
+              horizontal: 28,
+              vertical: 24,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(26),
+            ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 340),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(begin: .94, end: 1),
+                      duration: MediaQuery.of(c).disableAnimations
+                          ? Duration.zero
+                          : const Duration(milliseconds: 320),
+                      curve: Curves.easeOutCubic,
+                      builder: (_, scale, child) =>
+                          Transform.scale(scale: scale, child: child),
+                      child: ExcludeSemantics(
+                        child: Image.asset(
+                          'assets/art/toti-welcome-gift.png',
+                          width: 180,
+                          height: 180,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    const TText(
+                      'Welcome to Toti',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'SpaceGrotesk',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 24,
+                        color: Color(0xfffff5fb),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const TText(
+                      'Your first login gift',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Color(0xffddc8e3), fontSize: 14),
+                    ),
+                    const SizedBox(height: 12),
+                    const TText(
+                      '+888',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'SpaceGrotesk',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 40,
+                        height: 1.05,
+                        color: Color(0xffffb1dc),
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    const TText(
+                      'Coins',
+                      style: TextStyle(color: Color(0xffe6d5e9), fontSize: 14),
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: () => Navigator.pop(c),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: pink,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(48, 52),
+                        ),
+                        child: const TText('Continue'),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
         );
       });
