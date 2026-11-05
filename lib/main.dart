@@ -488,6 +488,7 @@ class _LoginState extends State<Login> {
   bool entering = false;
   bool registering = false;
   bool showPassword = false;
+  bool showingAccount = false;
   final formKey = GlobalKey<FormState>();
   final email = TextEditingController();
   final password = TextEditingController();
@@ -593,8 +594,129 @@ class _LoginState extends State<Login> {
     ),
   );
 
+  void returnToWelcome() {
+    if (entering) return;
+    FocusScope.of(context).unfocus();
+    setState(() => showingAccount = false);
+  }
+
+  Widget agreement(BuildContext c) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Semantics(
+        label: tr(
+          'I am 18 or older and agree to the Terms of Service and Privacy Policy.',
+        ),
+        checked: accepted,
+        child: InkWell(
+          key: const ValueKey('accept-terms'),
+          onTap: () => setState(() => accepted = !accepted),
+          child: SizedBox(
+            width: 48,
+            height: 48,
+            child: Center(child: controlArtwork(accepted ? 1 : 2, size: 28)),
+          ),
+        ),
+      ),
+      Expanded(
+        child: Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            const TText('I am 18 or older and agree to the '),
+            TextButton(
+              style: linkStyle,
+              onPressed: () =>
+                  open(c, const PolicyPage('Terms of Service', termsUrl)),
+              child: const TText('Terms of Service'),
+            ),
+            const TText(' and '),
+            TextButton(
+              style: linkStyle,
+              onPressed: () =>
+                  open(c, const PolicyPage('Privacy Policy', privacyUrl)),
+              child: const TText('Privacy Policy'),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+
+  Widget welcome(BuildContext c) => Scaffold(
+    body: SafeArea(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset('assets/art/account-entry-scene.png', fit: BoxFit.cover),
+          const ColoredBox(color: Color(0x7a10071c)),
+          LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(26, 24, 26, 24),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: (constraints.maxHeight - 48).clamp(
+                    0,
+                    double.infinity,
+                  ),
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    children: [
+                      const Spacer(flex: 4),
+                      const TText(
+                        'Toti',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'SpaceGrotesk',
+                          fontSize: 34,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const TText(
+                        'Find your people. Share your moments.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Color(0xfff7edf4)),
+                      ),
+                      const Spacer(flex: 5),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          key: const ValueKey('welcome-email'),
+                          onPressed: () =>
+                              setState(() => showingAccount = true),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: pink,
+                            foregroundColor: Colors.white,
+                            minimumSize: const Size(48, 52),
+                          ),
+                          child: const TText('Continue with email'),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      agreement(c),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
   @override
-  Widget build(BuildContext c) => Scaffold(
+  Widget build(BuildContext c) => PopScope(
+    canPop: !showingAccount,
+    onPopInvokedWithResult: (didPop, _) {
+      if (!didPop && showingAccount) returnToWelcome();
+    },
+    child: showingAccount ? accountForm(c) : welcome(c),
+  );
+
+  Widget accountForm(BuildContext c) => Scaffold(
     resizeToAvoidBottomInset: true,
     body: SafeArea(
       child: Stack(
@@ -629,6 +751,14 @@ class _LoginState extends State<Login> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    TextButton(
+                      onPressed: entering ? null : returnToWelcome,
+                      style: TextButton.styleFrom(
+                        backgroundColor: const Color(0x99301c3e),
+                        minimumSize: const Size(48, 44),
+                      ),
+                      child: iconLabel(controlArtwork(0, size: 18), 'Back'),
+                    ),
                     const SizedBox(height: 14),
                     const TText(
                       'Toti',
@@ -784,62 +914,7 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Semantics(
-                          label: tr(
-                            'I am 18 or older and agree to the Terms of Service and Privacy Policy.',
-                          ),
-                          checked: accepted,
-                          child: InkWell(
-                            key: const ValueKey('accept-terms'),
-                            onTap: () => setState(() => accepted = !accepted),
-                            child: SizedBox(
-                              width: 48,
-                              height: 48,
-                              child: Center(
-                                child: controlArtwork(
-                                  accepted ? 1 : 2,
-                                  size: 28,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              const TText('I am 18 or older and agree to the '),
-                              TextButton(
-                                style: linkStyle,
-                                onPressed: () => open(
-                                  c,
-                                  const PolicyPage(
-                                    'Terms of Service',
-                                    termsUrl,
-                                  ),
-                                ),
-                                child: const TText('Terms of Service'),
-                              ),
-                              const TText(' and '),
-                              TextButton(
-                                style: linkStyle,
-                                onPressed: () => open(
-                                  c,
-                                  const PolicyPage(
-                                    'Privacy Policy',
-                                    privacyUrl,
-                                  ),
-                                ),
-                                child: const TText('Privacy Policy'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                    agreement(c),
                   ],
                 ),
               ),
