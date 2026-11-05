@@ -37,7 +37,7 @@ class AppStore extends ChangeNotifier with WidgetsBindingObserver {
   late SharedPreferences prefs;
   late Map<String, dynamic> data;
   late Map<String, dynamic> translations;
-  late List<Member> members;
+  List<Member> members = [];
   Map<String, dynamic> state = {};
   String? activeUserId;
   bool cloudContentLoaded = false;

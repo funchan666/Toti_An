@@ -80,6 +80,8 @@ class _TotiStartupState extends State<TotiStartup> {
   Widget build(BuildContext context) => FutureBuilder<void>(
     future: initialization,
     builder: (context, snapshot) {
+      final failed =
+          snapshot.connectionState == ConnectionState.done && snapshot.hasError;
       if (snapshot.connectionState == ConnectionState.done &&
           !snapshot.hasError) {
         return const TotiApp();
@@ -103,7 +105,7 @@ class _TotiStartupState extends State<TotiStartup> {
                       semanticLabel: 'Toti',
                     ),
                     const SizedBox(height: 28),
-                    if (snapshot.hasError) ...[
+                    if (failed) ...[
                       const Text(
                         'Unable to start Toti. Please try again.',
                         textAlign: TextAlign.center,
