@@ -1,0 +1,14 @@
+{
+  "app": "Toti Android",
+  "application_id": "com.toticonnect.meetcommunity",
+  "stage": "A",
+  "account": "Buy",
+  "organization_id": "vlktosuaxlyxcufhhfzx",
+  "project_name": "toti-an-a-20261105",
+  "region": "us-east-1",
+  "creation_attempt": "toti-an-a-20261105-initial",
+  "creation_attempt_recorded_at": "2026-11-05T01:51:57.379920+00:00",
+  "creation_status": "created",
+  "project_ref": "zmtihifixkymzcicbswh",
+  "note": "Create tool returned ACTIVE_HEALTHY; deployment not yet performed."
+}

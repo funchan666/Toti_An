@@ -1,0 +1,330 @@
+{
+  "project_ref": "zmtihifixkymzcicbswh",
+  "bucket": "toti-editorial",
+  "results": [
+    {
+      "path": "assets/portraits/alpine-ridge-lookout.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/boulevard-snack-stop.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/brick-lane-style.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/cafe-step-portrait.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/canal-afternoon.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/canyon-hike.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/car-window-portrait.webp",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/city-icecream-walk.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/city-pop-evening.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/cliffside-sunset.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/coastal-friends.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/crosswalk-daylight.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/daydream-closeup.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/evening-cat-cafe.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/evening-red-dress.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/gallery-eye-portrait.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/garden-balcony.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/garden-yellow-top.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/great-wall-rest.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/green-cap-profile.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/harbor-cap-look.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/harbor-rail-pose.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/headphone-mirror.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/highland-summit.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/lakefront-breeze.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/london-street.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/meadow-dog-picnic.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/metro-bandana.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/mirror-daylight.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/modern-city-square.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/moment-stills/above-clouds-broadcast.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/moment-stills/garden-day-live.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/mountain-lake-stop.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/old-town-dress.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/old-town-gelato.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/park-picnic.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/reel-stills/boulevard-selfie.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/reel-stills/brownstone-style.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/reel-stills/canal-city-walk.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/reel-stills/cliffside-dive.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/reel-stills/evening-driving-range.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/reel-stills/railway-greenway.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/reel-stills/sunlit-sidewalk.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/reel-stills/trail-conversation.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/riverside-black-dress.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/riverside-wheel-view.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/rocky-trail-smile.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/room-stills/city-dance-corner.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/room-stills/courtyard-dance-live.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/room-stills/friends-city-walk.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/room-stills/night-skyline-chat.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/room-stills/rooftop-food-live.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/room-stills/street-style-live.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/skyline-evening.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/soft-morning-portrait.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/street-camera-reflection.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/studio-headphone.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/sunhat-blue-sky.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/sunhat-lakeside.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/terrace-sunglasses.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/train-window-light.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/watch-district-walk.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/waterfront-blue-sky.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/portraits/yellow-cab-corner.jpg",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/above-clouds-broadcast.mp4",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/boulevard-selfie.mp4",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/brownstone-style.mp4",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/canal-city-walk.mp4",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/city-dance-corner.mp4",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/cliffside-dive.mp4",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/closeup-story-live.mp4",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/courtyard-dance-live.mp4",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/evening-driving-range.mp4",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/friends-city-walk.mp4",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/garden-day-live.mp4",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/night-skyline-chat.mp4",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/railway-greenway.mp4",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/rooftop-food-live.mp4",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/street-style-live.mp4",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/sunlit-sidewalk.mp4",
+      "status": "verified"
+    },
+    {
+      "path": "assets/videos/trail-conversation.mp4",
+      "status": "verified"
+    }
+  ]
+}

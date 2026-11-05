@@ -1,0 +1,766 @@
+{
+  "purpose": "Source inventory only; no upload, deployment, or app integration is implied.",
+  "source": "assets/data/community.json",
+  "source_sha256": "ea9bd8f035d4faec24e33d3afdd29b1a21c2816e33d2b18f8846b9653b6ffe68",
+  "collections": {
+    "names": 48,
+    "countries": 48,
+    "profileNotes": 12,
+    "interestCatalog": 12,
+    "doorways": 6,
+    "availability": 4,
+    "images": 47,
+    "liveVideos": 9,
+    "reels": 8,
+    "reelComments": 27
+  },
+  "rendered_member_count": 47,
+  "member_id_rule": "member-{zero-based image index}",
+  "reel_display_order": [
+    2,
+    1,
+    0,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "additional_sources": [
+    "lib/main.dart: roomSeeds",
+    "lib/main.dart: Moments seed"
+  ],
+  "missing_community_media": [],
+  "media": [
+    {
+      "path": "assets/portraits/alpine-ridge-lookout.jpg",
+      "bytes": 252658,
+      "sha256": "cf9801aadc952479a35d21b2b7ffe43a8e16b357a1dca2073a43ae03e6d544b8",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-2.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/boulevard-snack-stop.jpg",
+      "bytes": 220302,
+      "sha256": "98c110a042e93f939202c44bb8a0c808feb676158bcc9180fe832a80fe0b742e",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-0.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/brick-lane-style.jpg",
+      "bytes": 275297,
+      "sha256": "448d94843b7d73f6fbcca04349f6da1491a97e1bd947eae55608c83d1bca2974",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-11.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/cafe-step-portrait.jpg",
+      "bytes": 169058,
+      "sha256": "eb68b671898a1d74c72fbb9bc928de597b056e5d72804fb206dd180d754aedf6",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-6.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/canal-afternoon.jpg",
+      "bytes": 270848,
+      "sha256": "d6dc1c17def512140b4d6cbac27aa1097fd5715c2c709befac3a9ea0e65178ed",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-15.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/canyon-hike.jpg",
+      "bytes": 243376,
+      "sha256": "8ef565c9d8adb75890aa2d455e16f95eb0654edf6f5ffece71f8089a78a98654",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-30.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/car-window-portrait.webp",
+      "bytes": 49522,
+      "sha256": "e5716fddfa1fa35cb390f4c8413337e452314f9a26207ee68f4f40e7e9f4b45f",
+      "mime": "image/webp",
+      "community_references": [
+        "member-34.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/city-icecream-walk.jpg",
+      "bytes": 229492,
+      "sha256": "d4c03c17610081c0f1e770b38b80c1ee78e7329611da9eb060d09b28b4dc900c",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-40.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/city-pop-evening.jpg",
+      "bytes": 110372,
+      "sha256": "ac2fbb8050da93ffd7554abeac23f62d5510384b932e97687eb4ba9c64acda84",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-12.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/cliffside-sunset.jpg",
+      "bytes": 67238,
+      "sha256": "c412d10a49eccbe7431e4bb06f930adc36f78d4616e18ba616741f48d912e557",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-5.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/coastal-friends.jpg",
+      "bytes": 446552,
+      "sha256": "16efef24a8e47c4d7025579755d57118eaeebf25ed156bb8c7fb671202e6a38a",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-35.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/crosswalk-daylight.jpg",
+      "bytes": 129646,
+      "sha256": "bf4f15760deaf277a379423bdc1c38c434fee5f7c59c5f935f0b6bbcbf5bc439",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-41.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/daydream-closeup.jpg",
+      "bytes": 111711,
+      "sha256": "8710ad249d5925435e2aca4177e016bf4de8af69008f0a52ca589217d3fa22f0",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-20.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/evening-cat-cafe.jpg",
+      "bytes": 139628,
+      "sha256": "8d82e21cc0e4dfd83e4e172ce226666f79964aa53a1e8dcdb7f9cd5bfb6cfd1b",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-8.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/evening-red-dress.jpg",
+      "bytes": 137447,
+      "sha256": "33ddd7a071b658570c2b7b01f88376e2cc8fd0486bf1ea9cf9136f694d15afe9",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-21.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/gallery-eye-portrait.jpg",
+      "bytes": 137041,
+      "sha256": "e5bda7f370994c1be4a1c4e065eb19460dcaa35af0d5cfee8389fc54518ff96a",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-3.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/garden-balcony.jpg",
+      "bytes": 283256,
+      "sha256": "2b698a8ede221acd7fd7706ee1ce3c3562f759bfaad62480c150e7579134393c",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-10.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/garden-yellow-top.jpg",
+      "bytes": 191956,
+      "sha256": "f1296dc720ec6abcffbde39103a2f29b9c2992a7a37ec6bc3507502e2e771a40",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-46.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/great-wall-rest.jpg",
+      "bytes": 201426,
+      "sha256": "9f1099b9a10f9a4b43d442684dd22fab25893c683fc5e42fdb638f33d85fb9bc",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-25.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/green-cap-profile.jpg",
+      "bytes": 107383,
+      "sha256": "f75eba98ae8018e99a67dbc30caa03aba4c0aaf05d2d15d25ab3cc2ea34475e3",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-24.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/harbor-cap-look.jpg",
+      "bytes": 220857,
+      "sha256": "cfe8eee01fe8c29d0876f60241c2dd0e992b55441b7b272c41c760137b2f2444",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-17.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/harbor-rail-pose.jpg",
+      "bytes": 270646,
+      "sha256": "a377ae141ce00d9bc9c0b478860d6f2cc14bc7413591fcebb0d87bd9387a80d5",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-14.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/headphone-mirror.jpg",
+      "bytes": 95902,
+      "sha256": "c74399e1febda73f09dcc7c4ce9a91b58deb7255b02272f455095ec33ad8884e",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-29.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/highland-summit.jpg",
+      "bytes": 186671,
+      "sha256": "409cdd3435f290ffe9cc7c6931487deaa91f2a1a943f576c2eb628144e9b6812",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-9.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/lakefront-breeze.jpg",
+      "bytes": 206163,
+      "sha256": "04f07365218b4504f125229b14d91ec38a59a0b1f55fcdde41d462ce9ac6daae",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-36.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/london-street.jpg",
+      "bytes": 175263,
+      "sha256": "a2f66ac0465efaee876a1847e549702e3517135323a321e307444177babe84e8",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-16.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/meadow-dog-picnic.jpg",
+      "bytes": 411801,
+      "sha256": "39c025e7f078db290f2216cb4ed0d247ded58acd8900557f522dc55996c8d1a8",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-22.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/metro-bandana.jpg",
+      "bytes": 98148,
+      "sha256": "27a88f5a7b51c03b333e5122adb53fbb49cfe2ba36fae0e6292648e3d7c3f46a",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-43.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/mirror-daylight.jpg",
+      "bytes": 123469,
+      "sha256": "4556d8bce733a2b797cc2687661e11e28d0478638eeccfb219a004a7623d948f",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-23.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/modern-city-square.jpg",
+      "bytes": 233441,
+      "sha256": "dca242c21153ff37ce6ddec0dc7736f407534fdec77fa019f5ca9aad85e50fb7",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-19.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/moment-stills/above-clouds-broadcast.jpg",
+      "bytes": 55894,
+      "sha256": "52dc574fc29f10218151701fe0134606909c3a9b42184062a372f969653e22b2",
+      "mime": "image/jpeg",
+      "community_references": [
+        "Moments bundled seed"
+      ]
+    },
+    {
+      "path": "assets/portraits/moment-stills/garden-day-live.jpg",
+      "bytes": 106172,
+      "sha256": "9d53eb3bb121cc92ed95020b5fc07417fdc7c906e8a2cfad926e43eaa6aabe9e",
+      "mime": "image/jpeg",
+      "community_references": [
+        "Moments bundled seed"
+      ]
+    },
+    {
+      "path": "assets/portraits/mountain-lake-stop.jpg",
+      "bytes": 143703,
+      "sha256": "121ab5f0dd417df647c04d1c3a45400618c7030d26ed07701bea8087ef89df29",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-38.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/old-town-dress.jpg",
+      "bytes": 168158,
+      "sha256": "a326fc2a10e7e71d39583ffef3df7cc925ae50fbd21fbdb768cfe6ef932c8101",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-27.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/old-town-gelato.jpg",
+      "bytes": 188756,
+      "sha256": "398cb003e2dbce6e004ae847acced3f73c252f611cb74038f8413b5782f48f33",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-42.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/park-picnic.jpg",
+      "bytes": 314060,
+      "sha256": "3001fe22679c2957dc93590f2f2a2ebcc9c9232911d462b548d1ba911922e0ad",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-26.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/reel-stills/boulevard-selfie.jpg",
+      "bytes": 48606,
+      "sha256": "bd473d9c882347e5140d162c6cb962aeab2d3212794d0a88cb5494032836f9cd",
+      "mime": "image/jpeg",
+      "community_references": [
+        "reels[3].thumbnail"
+      ]
+    },
+    {
+      "path": "assets/portraits/reel-stills/brownstone-style.jpg",
+      "bytes": 141774,
+      "sha256": "1e77f373f81e252d234028babe300bb111f704eff513acd181d27ac416a50564",
+      "mime": "image/jpeg",
+      "community_references": [
+        "reels[4].thumbnail"
+      ]
+    },
+    {
+      "path": "assets/portraits/reel-stills/canal-city-walk.jpg",
+      "bytes": 132813,
+      "sha256": "09e83b0f293b55470569c9d926c538287ef64c847267e76f81226b5fe9310bea",
+      "mime": "image/jpeg",
+      "community_references": [
+        "reels[7].thumbnail"
+      ]
+    },
+    {
+      "path": "assets/portraits/reel-stills/cliffside-dive.jpg",
+      "bytes": 54165,
+      "sha256": "657109fcedf223209aea2149b1402ace5f15f5fa98fc9bddd87f79ef03bc6f27",
+      "mime": "image/jpeg",
+      "community_references": [
+        "reels[5].thumbnail"
+      ]
+    },
+    {
+      "path": "assets/portraits/reel-stills/evening-driving-range.jpg",
+      "bytes": 57989,
+      "sha256": "a18d43e69ae6a84d318ca99c9870c2511e2264d27660ef6c36d6ae40f0b8a3a5",
+      "mime": "image/jpeg",
+      "community_references": [
+        "reels[1].thumbnail"
+      ]
+    },
+    {
+      "path": "assets/portraits/reel-stills/railway-greenway.jpg",
+      "bytes": 153584,
+      "sha256": "68578d938394691c22bad1d7d1476caf65240e5cdb664c05700ab32632693dec",
+      "mime": "image/jpeg",
+      "community_references": [
+        "reels[2].thumbnail"
+      ]
+    },
+    {
+      "path": "assets/portraits/reel-stills/sunlit-sidewalk.jpg",
+      "bytes": 99033,
+      "sha256": "18b8d82ca1a1caad06a7d3c125b3e92995e3834fcaa400c6a0ec1b7efebece40",
+      "mime": "image/jpeg",
+      "community_references": [
+        "reels[0].thumbnail"
+      ]
+    },
+    {
+      "path": "assets/portraits/reel-stills/trail-conversation.jpg",
+      "bytes": 89634,
+      "sha256": "1723356623b908b2ffdffd34792a4e1805cd6b0044a12de1cb5fd727ff54fc07",
+      "mime": "image/jpeg",
+      "community_references": [
+        "reels[6].thumbnail"
+      ]
+    },
+    {
+      "path": "assets/portraits/riverside-black-dress.jpg",
+      "bytes": 293692,
+      "sha256": "34935d7a804cdbe36a1a32d6064ad5bed2c025cf42077794b2698397e284866d",
+      "mime": "image/jpeg",
+      "community_references": [
+        "lib/main.dart literal photo",
+        "lib/main.dart literal photo"
+      ]
+    },
+    {
+      "path": "assets/portraits/riverside-wheel-view.jpg",
+      "bytes": 144464,
+      "sha256": "b14ccdea8dba4208825dbaeae3f0b46c2681f282b7b9cfafd3e83839db90cad5",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-7.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/rocky-trail-smile.jpg",
+      "bytes": 188960,
+      "sha256": "c0ec40b272208b87df297471baba2174b355eac90672db3b6eeaf01e64425840",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-39.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/room-stills/city-dance-corner.jpg",
+      "bytes": 125576,
+      "sha256": "22734e744abb146952df4f96a591fe7cd149cca8d5b9050cafbbf089cc399e21",
+      "mime": "image/jpeg",
+      "community_references": [
+        "room:game-night.cover"
+      ]
+    },
+    {
+      "path": "assets/portraits/room-stills/courtyard-dance-live.jpg",
+      "bytes": 94934,
+      "sha256": "c7f459403b3847269e260bfefa1e6704521fe8b4e2ca1bedbc8bd22e240b7df1",
+      "mime": "image/jpeg",
+      "community_references": [
+        "room:late-night-cinema.cover"
+      ]
+    },
+    {
+      "path": "assets/portraits/room-stills/friends-city-walk.jpg",
+      "bytes": 138562,
+      "sha256": "ae26abcf303d09522cf5d8873cf09e913409dc3adea012e3e1abf603b854c78d",
+      "mime": "image/jpeg",
+      "community_references": [
+        "room:travel-postcards.cover"
+      ]
+    },
+    {
+      "path": "assets/portraits/room-stills/night-skyline-chat.jpg",
+      "bytes": 80424,
+      "sha256": "1fa0bbf5e82ce9cfb93bc3b6d7d348ed6a43bbc4e6448e5bb9af665a03b62666",
+      "mime": "image/jpeg",
+      "community_references": [
+        "room:glow-after-dark.cover"
+      ]
+    },
+    {
+      "path": "assets/portraits/room-stills/rooftop-food-live.jpg",
+      "bytes": 89452,
+      "sha256": "603700af691a357bc7b35e35a9182c24cc493cd12085548dce8281bb6408ec64",
+      "mime": "image/jpeg",
+      "community_references": [
+        "room:coffee-good-news.cover"
+      ]
+    },
+    {
+      "path": "assets/portraits/room-stills/street-style-live.jpg",
+      "bytes": 171247,
+      "sha256": "a8a5997f5fb3f5c0d929b14b13b6d1fd2d316bb305ef8d62b0164bb36431a3b9",
+      "mime": "image/jpeg",
+      "community_references": [
+        "room:city-pop-lounge.cover"
+      ]
+    },
+    {
+      "path": "assets/portraits/skyline-evening.jpg",
+      "bytes": 145788,
+      "sha256": "6f860300bf3c8f17e8b21cd2a9d1ae8c70f2416c6439082798a96edcc4b51e24",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-32.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/soft-morning-portrait.jpg",
+      "bytes": 254691,
+      "sha256": "c374c439547f0ff4b4b35bbdf713a0a56c00a865106792fbe32f1e385c3e6ccc",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-1.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/street-camera-reflection.jpg",
+      "bytes": 127304,
+      "sha256": "5dfca2b291355d2da9aaf8bc3da86c518b60b9d630e99694fb94ca2d788af99d",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-33.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/studio-headphone.jpg",
+      "bytes": 95791,
+      "sha256": "449c792756478a3c41de9f014b46df362cef38404f40a4acf381b4222a3b2e6a",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-44.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/sunhat-blue-sky.jpg",
+      "bytes": 151595,
+      "sha256": "837c4bf1949b64d715d856894244143af2e53159e74a5f82877b65242479e5cd",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-45.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/sunhat-lakeside.jpg",
+      "bytes": 162474,
+      "sha256": "c968d84b4027f2e7b5a211952d4c981eb40765ba1c32dbe5262d09acb72a5d0d",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-37.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/terrace-sunglasses.jpg",
+      "bytes": 157385,
+      "sha256": "bbd8cbe917b3b1ca2b4d1134ea7f8a6608178d1a2635906878557a0813d481ef",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-28.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/train-window-light.jpg",
+      "bytes": 249329,
+      "sha256": "00d06bb2162a490f03c3b999d9a9767d90d9943f9704b19640c065dc734cea52",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-18.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/watch-district-walk.jpg",
+      "bytes": 301548,
+      "sha256": "9105d6254e575f800703f6397385d768a0a854ee75c3f55c3fbc6e6631a86a4b",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-31.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/waterfront-blue-sky.jpg",
+      "bytes": 187867,
+      "sha256": "ab72b249b6f273c3c5b9fd0145218a451612dea8ad85d2c702bea65f4e921331",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-4.image"
+      ]
+    },
+    {
+      "path": "assets/portraits/yellow-cab-corner.jpg",
+      "bytes": 255588,
+      "sha256": "55fcbd14d4c3640b1736f8062eb7daf94f0f98a44da69c58b2156ec16a099791",
+      "mime": "image/jpeg",
+      "community_references": [
+        "member-13.image"
+      ]
+    },
+    {
+      "path": "assets/videos/above-clouds-broadcast.mp4",
+      "bytes": 1502994,
+      "sha256": "28d01fc5f35fecf4c181118eea4d8087eca9d6063bd8091d11019db004940b33",
+      "mime": "video/mp4",
+      "community_references": [
+        "liveVideos[0]"
+      ]
+    },
+    {
+      "path": "assets/videos/boulevard-selfie.mp4",
+      "bytes": 1246113,
+      "sha256": "ede816d5327d1ead30a75c1353caabc744d736b1b171bf90bf7b7df280e0851f",
+      "mime": "video/mp4",
+      "community_references": [
+        "reels[3].video"
+      ]
+    },
+    {
+      "path": "assets/videos/brownstone-style.mp4",
+      "bytes": 1380924,
+      "sha256": "a175a7699d12a4b580cf4dbb0560d147a67af5e484b87b4bdaa18591b17a2bd6",
+      "mime": "video/mp4",
+      "community_references": [
+        "reels[4].video"
+      ]
+    },
+    {
+      "path": "assets/videos/canal-city-walk.mp4",
+      "bytes": 1948881,
+      "sha256": "8a8078821036e245bf860f36bec3d6911b570c6ec52285285241ae1f5dfa927c",
+      "mime": "video/mp4",
+      "community_references": [
+        "reels[7].video"
+      ]
+    },
+    {
+      "path": "assets/videos/city-dance-corner.mp4",
+      "bytes": 793042,
+      "sha256": "43b42685bd7dc4c00a6b2a77f1dc689b5c176d81763c0a0d45f127a75ace2554",
+      "mime": "video/mp4",
+      "community_references": [
+        "liveVideos[1]"
+      ]
+    },
+    {
+      "path": "assets/videos/cliffside-dive.mp4",
+      "bytes": 3447230,
+      "sha256": "8363feaa50cb877c291c1a1a440769c12295912196e9eba1a5c95e9d78c1cae6",
+      "mime": "video/mp4",
+      "community_references": [
+        "reels[5].video"
+      ]
+    },
+    {
+      "path": "assets/videos/closeup-story-live.mp4",
+      "bytes": 1414641,
+      "sha256": "520520d795f558b78c1ce598dbbd21f444197f3f3f58c720a5a6ae8e2974d767",
+      "mime": "video/mp4",
+      "community_references": [
+        "liveVideos[5]"
+      ]
+    },
+    {
+      "path": "assets/videos/courtyard-dance-live.mp4",
+      "bytes": 1099618,
+      "sha256": "2a2ad72eba1705be03529a2fcfcfb5368ccdcbbdb8047747186ecc97f6ce7dbd",
+      "mime": "video/mp4",
+      "community_references": [
+        "liveVideos[6]"
+      ]
+    },
+    {
+      "path": "assets/videos/evening-driving-range.mp4",
+      "bytes": 1017826,
+      "sha256": "eae27713beaf7e462410e5724a13dae85cc7e56aaf8468cc7f81b45732479ed7",
+      "mime": "video/mp4",
+      "community_references": [
+        "reels[1].video"
+      ]
+    },
+    {
+      "path": "assets/videos/friends-city-walk.mp4",
+      "bytes": 1607463,
+      "sha256": "b9d3c8a1f6a9ccaa38f7d2c1f43c27bd0bc35d0b7c08689222819befc1e01795",
+      "mime": "video/mp4",
+      "community_references": [
+        "liveVideos[4]"
+      ]
+    },
+    {
+      "path": "assets/videos/garden-day-live.mp4",
+      "bytes": 8210434,
+      "sha256": "3c701817bfdbdda8a9afba15b0bb467d74749a4edcc3234e4fe89419d6991214",
+      "mime": "video/mp4",
+      "community_references": [
+        "liveVideos[7]"
+      ]
+    },
+    {
+      "path": "assets/videos/night-skyline-chat.mp4",
+      "bytes": 1583544,
+      "sha256": "d7830fac8cc5a845f850d8bb609819c4a667b24f43d39e8dae98c26074890260",
+      "mime": "video/mp4",
+      "community_references": [
+        "liveVideos[2]"
+      ]
+    },
+    {
+      "path": "assets/videos/railway-greenway.mp4",
+      "bytes": 792587,
+      "sha256": "2715e18060553828208ea88d5d57f6bea79c18a260fff67ce9287767722a6de7",
+      "mime": "video/mp4",
+      "community_references": [
+        "reels[2].video"
+      ]
+    },
+    {
+      "path": "assets/videos/rooftop-food-live.mp4",
+      "bytes": 1112994,
+      "sha256": "2d8f18f967ed2ee482c7246449535a96856f81990620225874f7570db5696a46",
+      "mime": "video/mp4",
+      "community_references": [
+        "liveVideos[8]"
+      ]
+    },
+    {
+      "path": "assets/videos/street-style-live.mp4",
+      "bytes": 985718,
+      "sha256": "a472ac2d90c618ace877002bd44c4776d7bd9ceae7c3e5f2f3f7f56cd1507a35",
+      "mime": "video/mp4",
+      "community_references": [
+        "liveVideos[3]"
+      ]
+    },
+    {
+      "path": "assets/videos/sunlit-sidewalk.mp4",
+      "bytes": 1069769,
+      "sha256": "5e554c813c164e79a436dd6483c98f90b1860703261cc1c1aa793296ea963e2c",
+      "mime": "video/mp4",
+      "community_references": [
+        "reels[0].video"
+      ]
+    },
+    {
+      "path": "assets/videos/trail-conversation.mp4",
+      "bytes": 676747,
+      "sha256": "b8ec31e811a4ef46c8e72e5fc594ae1aabbcdcb8deba13c4fc8a4551f857870a",
+      "mime": "video/mp4",
+      "community_references": [
+        "reels[6].video"
+      ]
+    }
+  ]
+}
