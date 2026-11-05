@@ -41,10 +41,106 @@ late AppStore store;
 final routeObserver = RouteObserver<PageRoute<dynamic>>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await TotiCloud.initialize();
-  store = AppStore();
-  await store.init();
-  runApp(const TotiApp());
+  runApp(const TotiStartup());
+}
+
+class TotiStartup extends StatefulWidget {
+  const TotiStartup({super.key});
+
+  @override
+  State<TotiStartup> createState() => _TotiStartupState();
+}
+
+class _TotiStartupState extends State<TotiStartup> {
+  bool cloudReady = false;
+  late Future<void> initialization;
+
+  @override
+  void initState() {
+    super.initState();
+    initialization = initialize();
+  }
+
+  Future<void> initialize() async {
+    if (!cloudReady) {
+      await TotiCloud.initialize();
+      cloudReady = true;
+    }
+    final nextStore = AppStore();
+    try {
+      await nextStore.init();
+      store = nextStore;
+    } catch (_) {
+      nextStore.dispose();
+      rethrow;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => FutureBuilder<void>(
+    future: initialization,
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.done &&
+          !snapshot.hasError) {
+        return const TotiApp();
+      }
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          backgroundColor: const Color(0xff07020c),
+          body: SafeArea(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      'assets/art/toti-app-icon.png',
+                      width: 160,
+                      height: 160,
+                      fit: BoxFit.contain,
+                      semanticLabel: 'Toti',
+                    ),
+                    const SizedBox(height: 28),
+                    if (snapshot.hasError) ...[
+                      const Text(
+                        'Unable to start Toti. Please try again.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Color(0xfff3d9ec)),
+                      ),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: () => setState(() {
+                          initialization = initialize();
+                        }),
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xffff8fd7),
+                        ),
+                        child: const Text('Try again'),
+                      ),
+                    ] else
+                      SizedBox(
+                        width: 96,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: const LinearProgressIndicator(
+                            minHeight: 3,
+                            color: Color(0xffff39b4),
+                            backgroundColor: Color(0xff3b1238),
+                            semanticsLabel: 'Loading Toti',
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
 }
 
 class TotiApp extends StatelessWidget {
