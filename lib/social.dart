@@ -78,6 +78,7 @@ class SocialStore extends ChangeNotifier {
           if (connected) {
             unawaited(refresh());
           } else {
+            _generation++;
             _clearRemote();
             error = 'Connection unavailable. Tap to retry.';
             notifyListeners();
@@ -254,12 +255,16 @@ class SocialStore extends ChangeNotifier {
 
   Future<void> importLegacyLikes(List<String> contents) async {
     if (contents.isEmpty) return;
-    await client.from('content_likes').upsert(
-      [for (final content in contents)
-        {'user_id': userId, 'content_id': content, 'active': true}],
-      onConflict: 'user_id,content_id',
-      ignoreDuplicates: true,
-    );
+    await client
+        .from('content_likes')
+        .upsert(
+          [
+            for (final content in contents)
+              {'user_id': userId, 'content_id': content, 'active': true},
+          ],
+          onConflict: 'user_id,content_id',
+          ignoreDuplicates: true,
+        );
   }
 
   static String newMessageId() {

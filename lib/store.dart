@@ -470,14 +470,19 @@ class AppStore extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> _migrateLegacyInteractions(SocialStore remote) async {
     final account = activeUserId;
-    if (account == null || remote.userId != account ||
+    if (account == null ||
+        remote.userId != account ||
         prefs.getString('toti_legacy_owner') != account ||
-        (state['legacyLikesMigrated'] == true && state['legacyCommentsMigrated'] == true)) return;
+        (state['legacyLikesMigrated'] == true &&
+            state['legacyCommentsMigrated'] == true))
+      return;
     _legacyMigrationRunning = true;
     try {
       if (state['legacyLikesMigrated'] != true) {
         final likes = List<String>.from(get('likes', []));
-        final valid = likes.where((id) => id.isNotEmpty && id.length <= 300).toList();
+        final valid = likes
+            .where((id) => id.isNotEmpty && id.length <= 300)
+            .toList();
         await remote.importLegacyLikes(valid);
         if (activeUserId != account || social != remote) return;
         state['likes'] = likes.where((id) => !valid.contains(id)).toList();
@@ -486,20 +491,30 @@ class AppStore extends ChangeNotifier with WidgetsBindingObserver {
       }
       if (state['legacyCommentsMigrated'] != true) {
         final local = (get('comments', []) as List)
-            .map((item) => Map<String, dynamic>.from(item)).toList();
+            .map((item) => Map<String, dynamic>.from(item))
+            .toList();
         final migrated = <String>{};
         for (final row in local) {
           final id = row['id'];
           final content = row['content'];
           final body = row['text'];
-          if (row['member'] != null || id is! String || id.length < 9 || id.length > 55 ||
-              content is! String || content.isEmpty || content.length > 300 ||
-              body is! String || !allowed(body)) continue;
+          if (row['member'] != null ||
+              id is! String ||
+              id.length < 9 ||
+              id.length > 55 ||
+              content is! String ||
+              content.isEmpty ||
+              content.length > 300 ||
+              body is! String ||
+              !allowed(body))
+            continue;
           await remote.sendComment(content, body, 'legacy-$id');
           if (activeUserId != account || social != remote) return;
           migrated.add(id);
         }
-        state['comments'] = local.where((row) => !migrated.contains(row['id'])).toList();
+        state['comments'] = local
+            .where((row) => !migrated.contains(row['id']))
+            .toList();
         state['legacyCommentsMigrated'] = true;
         save();
       }

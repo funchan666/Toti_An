@@ -2098,6 +2098,7 @@ void report(BuildContext c, String id, Member? member) {
             ListTile(
               title: TText(reason),
               onTap: () async {
+                final reporter = store.activeUserId;
                 try {
                   await TotiCloud.submitReport(id, member?.id, reason);
                 } catch (_) {
@@ -2110,7 +2111,11 @@ void report(BuildContext c, String id, Member? member) {
                   }
                   return;
                 }
-                if (!ctx.mounted || !c.mounted) return;
+                if (!ctx.mounted ||
+                    !c.mounted ||
+                    reporter == null ||
+                    store.activeUserId != reporter)
+                  return;
                 store.addRecord('reports', {
                   'id': id,
                   'user': member?.id,
@@ -3673,7 +3678,7 @@ class _RoomPageState extends State<RoomPage>
                                       ),
                                       const SizedBox(height: 3),
                                       const TText(
-                                        'Example room · audio and messages are not shared',
+                                        'Audio is unavailable; messages are not shared.',
                                         style: TextStyle(
                                           color: Color(0xffdcc9df),
                                           fontSize: 11,
@@ -4218,7 +4223,7 @@ class _LiveRoomState extends State<LiveRoom>
                                       ),
                                     ),
                                     const TText(
-                                      'Preview',
+                                      'Recorded',
                                       style: TextStyle(
                                         color: Color(0xffffb4df),
                                         fontSize: 10,
@@ -5057,7 +5062,7 @@ class _ConversationState extends State<Conversation> {
             const Padding(
               padding: EdgeInsets.all(10),
               child: TText(
-                'Only you can see these messages; they are not sent to anyone.',
+                'Messages are not sent for this profile.',
                 style: TextStyle(color: muted),
               ),
             ),
@@ -5167,12 +5172,13 @@ class _ConversationState extends State<Conversation> {
                 pendingText = null;
                 pendingId = null;
               } catch (_) {
-                if (mounted)
+                if (mounted && c.mounted) {
                   notice(
                     c,
                     'Message not sent',
                     'Please check your connection and try again.',
                   );
+                }
               } finally {
                 if (mounted) setState(() => sending = false);
               }
@@ -5359,7 +5365,7 @@ class _CallPreviewState extends State<CallPreview> with WidgetsBindingObserver {
                 ),
                 const SizedBox(height: 6),
                 const TText(
-                  'Preview only · no call is connected',
+                  'Calls are unavailable',
                   textAlign: TextAlign.center,
                 ),
                 TText(
@@ -7061,7 +7067,7 @@ class _LiveSetupState extends State<LiveSetup> {
         header('Open a live conversation'),
         const SizedBox(height: 8),
         const TText(
-          'Preview your camera and microphone. No broadcast service is connected.',
+          'Check your camera and microphone. Broadcasting is unavailable.',
           style: TextStyle(color: muted),
         ),
         const SizedBox(height: 20),
@@ -7071,7 +7077,7 @@ class _LiveSetupState extends State<LiveSetup> {
           decoration: const InputDecoration(labelText: 'Live title'),
         ),
         const SizedBox(height: 20),
-        action('Start preview', () {
+        action('Open camera', () {
           final t = title.text.trim();
           if (t.length < 3 || !allowed(t)) {
             notice(
@@ -7168,7 +7174,7 @@ class _CreatorPreviewState extends State<CreatorPreview>
 
   @override
   Widget build(BuildContext c) => Screen(
-    'Camera preview',
+    'Camera',
     Stack(
       fit: StackFit.expand,
       children: [
@@ -7197,7 +7203,7 @@ class _CreatorPreviewState extends State<CreatorPreview>
                   ),
                 ),
                 const SizedBox(height: 8),
-                const TText('Preview only · not broadcasting'),
+                const TText('Not broadcasting'),
                 if (error != null)
                   TextButton(onPressed: start, child: const TText('Try again')),
               ],

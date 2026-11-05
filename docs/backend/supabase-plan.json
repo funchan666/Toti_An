@@ -10,7 +10,7 @@
   "creation_attempt_recorded_at": "2026-11-05T01:51:57.379920+00:00",
   "creation_status": "created_healthy",
   "project_ref": "zmtihifixkymzcicbswh",
-  "note": "Content/media imported; account and profile client code written, Brevo SMTP, realtime interactions and runtime validation remain incomplete.",
+  "note": "Content/media, account, profile, avatar, realtime messages, comments, likes and reports are wired or deployed; app/runtime validation and the remaining business features are incomplete.",
   "auth_method": "email_password",
   "anonymous_sign_in": false,
   "media_verified_count": 81,
