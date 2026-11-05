@@ -8,7 +8,11 @@
   "region": "us-east-1",
   "creation_attempt": "toti-an-a-20261105-initial",
   "creation_attempt_recorded_at": "2026-11-05T01:51:57.379920+00:00",
-  "creation_status": "created",
+  "creation_status": "created_healthy",
   "project_ref": "zmtihifixkymzcicbswh",
-  "note": "Create tool returned ACTIVE_HEALTHY; deployment not yet performed."
+  "note": "Content/media imported; account and profile client code written, Brevo SMTP, realtime interactions and runtime validation remain incomplete.",
+  "auth_method": "email_password",
+  "anonymous_sign_in": false,
+  "media_verified_count": 81,
+  "stage_status": "incomplete"
 }

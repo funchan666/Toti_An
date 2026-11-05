@@ -7,10 +7,14 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show AuthException;
 import 'package:video_player/video_player.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'store.dart';
+import 'cloud.dart';
+import 'social.dart';
 
 const termsUrl = String.fromEnvironment(
   'TOTI_TERMS_URL',
@@ -37,6 +41,7 @@ late AppStore store;
 final routeObserver = RouteObserver<PageRoute<dynamic>>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await TotiCloud.initialize();
   store = AppStore();
   await store.init();
   runApp(const TotiApp());
@@ -209,26 +214,77 @@ void notice(BuildContext c, String title, String message) => showDialog<void>(
     ],
   ),
 );
-Widget photo(String name, {BoxFit fit = BoxFit.cover}) => Image.asset(
-  'assets/portraits/$name',
-  fit: fit,
-  errorBuilder: (_, _, _) => Container(color: panel2),
-);
+Future<void> toggleLike(BuildContext context, String id) async {
+  try {
+    await store.toggle('likes', id);
+  } catch (_) {
+    if (context.mounted) {
+      notice(
+        context,
+        'Could not update like',
+        'Please check your connection and try again.',
+      );
+    }
+  }
+}
+
+Widget photo(String name, {BoxFit fit = BoxFit.cover}) {
+  if (name == '__real_user__') {
+    return Image.asset('assets/art/profile-orbit-halo.png', fit: fit);
+  }
+  if (name.startsWith('$totiSupabaseUrl/storage/')) {
+    return Image.network(
+      name,
+      fit: fit,
+      errorBuilder: (_, _, _) =>
+          Image.asset('assets/art/profile-orbit-halo.png', fit: fit),
+    );
+  }
+  final path = 'assets/portraits/$name';
+  Widget bundled() => Image.asset(
+    path,
+    fit: fit,
+    errorBuilder: (_, _, _) => Container(color: panel2),
+  );
+  if (!store.cloudContentLoaded) return bundled();
+  return Image.network(
+    TotiCloud.mediaUrl(path).toString(),
+    fit: fit,
+    errorBuilder: (_, _, _) => bundled(),
+  );
+}
+
 Widget avatar(String name, {double size = 48}) => ClipOval(
   child: SizedBox(width: size, height: size, child: photo(name)),
 );
 Widget myAvatar({double size = 48, String? previewPath}) {
   final path = previewPath ?? store.get('avatarPath', '') as String;
+  final cloudKey = store.get('avatar_key', null);
+  Widget fallback() {
+    if (cloudKey is! String || cloudKey.isEmpty)
+      return photo('riverside-black-dress.jpg');
+    return FutureBuilder<String>(
+      future: TotiCloud.avatarUrl(cloudKey),
+      builder: (_, snapshot) => snapshot.hasData
+          ? Image.network(
+              snapshot.data!,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => photo('riverside-black-dress.jpg'),
+            )
+          : photo('riverside-black-dress.jpg'),
+    );
+  }
+
   return ClipOval(
     child: SizedBox(
       width: size,
       height: size,
       child: path.isEmpty
-          ? photo('riverside-black-dress.jpg')
+          ? fallback()
           : Image.file(
               File(path),
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => photo('riverside-black-dress.jpg'),
+              errorBuilder: (_, _, _) => fallback(),
             ),
     ),
   );
@@ -429,6 +485,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   bool accepted = false;
+  bool entering = false;
   bool registering = false;
   bool showPassword = false;
   final formKey = GlobalKey<FormState>();
@@ -445,6 +502,7 @@ class _LoginState extends State<Login> {
   }
 
   void switchMode(bool value) {
+    if (entering) return;
     if (registering == value) return;
     FocusScope.of(context).unfocus();
     password.clear();
@@ -455,7 +513,8 @@ class _LoginState extends State<Login> {
     });
   }
 
-  void enterPreview() {
+  Future<void> enterAccount() async {
+    if (entering) return;
     if (!formKey.currentState!.validate()) return;
     if (!accepted) {
       notice(
@@ -465,6 +524,54 @@ class _LoginState extends State<Login> {
       );
       return;
     }
+    setState(() => entering = true);
+    final creatingAccount = registering;
+    try {
+      final userId = creatingAccount
+          ? await TotiCloud.register(email.text.trim(), password.text)
+          : await TotiCloud.signIn(email.text.trim(), password.text);
+      if (!mounted) return;
+      if (userId == null) {
+        password.clear();
+        confirmation.clear();
+        setState(() {
+          entering = false;
+          registering = false;
+        });
+        notice(
+          context,
+          'Check your email',
+          'If registration is available, follow the confirmation link in your email, then sign in.',
+        );
+        return;
+      }
+      await store.activateAccount(userId);
+      await store.refreshCloudContent();
+      await store.restoreCloudProfile();
+    } on AuthException {
+      if (mounted) {
+        setState(() => entering = false);
+        notice(
+          context,
+          'Unable to continue',
+          creatingAccount
+              ? 'Registration could not be completed. Check your details and try again.'
+              : 'Check your email and password, and make sure your email is confirmed.',
+        );
+      }
+      return;
+    } catch (_) {
+      if (mounted) {
+        setState(() => entering = false);
+        notice(
+          context,
+          'Unable to continue',
+          'Please check your connection and try again.',
+        );
+      }
+      return;
+    }
+    if (!mounted) return;
     FocusScope.of(context).unfocus();
     email.clear();
     password.clear();
@@ -561,7 +668,7 @@ class _LoginState extends State<Login> {
                     ),
                     const SizedBox(height: 16),
                     const TText(
-                      'Preview only: no account is created. Email and password are not verified or saved.',
+                      'Sign in with your email, or create an account to get started.',
                       style: TextStyle(
                         color: Color(0xffe3cfe0),
                         fontSize: 12,
@@ -604,7 +711,7 @@ class _LoginState extends State<Login> {
                                 ? TextInputAction.next
                                 : TextInputAction.done,
                             onFieldSubmitted: (_) {
-                              if (!registering) enterPreview();
+                              if (!registering) enterAccount();
                             },
                             decoration:
                                 authDecoration(
@@ -640,7 +747,7 @@ class _LoginState extends State<Login> {
                               autocorrect: false,
                               autofillHints: const [],
                               textInputAction: TextInputAction.done,
-                              onFieldSubmitted: (_) => enterPreview(),
+                              onFieldSubmitted: (_) => enterAccount(),
                               decoration: authDecoration('Confirm password', 1),
                               validator: (value) => value == password.text
                                   ? null
@@ -654,7 +761,7 @@ class _LoginState extends State<Login> {
                     SizedBox(
                       width: double.infinity,
                       child: FilledButton(
-                        onPressed: enterPreview,
+                        onPressed: entering ? null : enterAccount,
                         style: FilledButton.styleFrom(
                           backgroundColor: pink,
                           foregroundColor: Colors.white,
@@ -663,7 +770,13 @@ class _LoginState extends State<Login> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const TText('Continue in preview'),
+                            TText(
+                              entering
+                                  ? 'Connecting…'
+                                  : registering
+                                  ? 'Create account'
+                                  : 'Sign in',
+                            ),
                             const SizedBox(width: 8),
                             authArtwork(4, size: 22),
                           ],
@@ -1162,6 +1275,22 @@ class Discover extends StatefulWidget {
 
 class _DiscoverState extends State<Discover> {
   String category = 'All', region = 'Global', query = '';
+  @override
+  void initState() {
+    super.initState();
+    store.addListener(_changed);
+  }
+
+  void _changed() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    store.removeListener(_changed);
+    super.dispose();
+  }
+
   static const regions = [
     'Global',
     'Europe',
@@ -1320,6 +1449,11 @@ class _DiscoverState extends State<Discover> {
         .toList();
     return Column(
       children: [
+        if (store.social?.error != null)
+          TextButton(
+            onPressed: () => store.social?.retry(),
+            child: TText(store.social!.error!),
+          ),
         Padding(
           padding: const EdgeInsets.fromLTRB(6, 4, 6, 0),
           child: Row(
@@ -1732,7 +1866,18 @@ class MemberPage extends StatelessWidget {
                     label: following ? 'Following' : 'Follow',
                     artwork: following ? 2 : 1,
                     primary: !following,
-                    onTap: () => store.toggle('following', member.id),
+                    onTap: () async {
+                      try {
+                        await store.toggle('following', member.id);
+                      } catch (_) {
+                        if (c.mounted)
+                          notice(
+                            c,
+                            'Could not update follow',
+                            'Please try again.',
+                          );
+                      }
+                    },
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -1906,8 +2051,19 @@ void safety(BuildContext c, String id, Member? member) {
                         child: const TText('Cancel'),
                       ),
                       TextButton(
-                        onPressed: () {
-                          store.block(member);
+                        onPressed: () async {
+                          try {
+                            await store.block(member);
+                          } catch (_) {
+                            if (d.mounted)
+                              notice(
+                                d,
+                                'Could not block account',
+                                'Please try again.',
+                              );
+                            return;
+                          }
+                          if (!d.mounted || !c.mounted) return;
                           Navigator.pop(d);
                           Navigator.popUntil(c, (r) => r.isFirst);
                         },
@@ -1941,7 +2097,20 @@ void report(BuildContext c, String id, Member? member) {
           ])
             ListTile(
               title: TText(reason),
-              onTap: () {
+              onTap: () async {
+                try {
+                  await TotiCloud.submitReport(id, member?.id, reason);
+                } catch (_) {
+                  if (ctx.mounted) {
+                    notice(
+                      ctx,
+                      'Could not submit report',
+                      'Please check your connection and try again.',
+                    );
+                  }
+                  return;
+                }
+                if (!ctx.mounted || !c.mounted) return;
                 store.addRecord('reports', {
                   'id': id,
                   'user': member?.id,
@@ -1950,8 +2119,8 @@ void report(BuildContext c, String id, Member? member) {
                 Navigator.pop(ctx);
                 notice(
                   c,
-                  'Report recorded',
-                  'This report is saved for your reference; no moderation service is connected. Reported content is hidden from your view.',
+                  'Report submitted',
+                  'Your report was submitted. The reported content is hidden from your view.',
                 );
               },
             ),
@@ -2113,10 +2282,23 @@ class _ReelsState extends State<Reels> with WidgetsBindingObserver, RouteAware {
       return;
     }
     loadedVideo = reels[index]['video'];
-    final p = VideoPlayerController.asset('assets/videos/$loadedVideo');
+    final path = 'assets/videos/$loadedVideo';
+    var p = store.cloudContentLoaded
+        ? VideoPlayerController.networkUrl(TotiCloud.mediaUrl(path))
+        : VideoPlayerController.asset(path);
     player = p;
     try {
-      await p.initialize();
+      try {
+        await p.initialize();
+      } catch (_) {
+        if (!store.cloudContentLoaded || !mounted || player != p) rethrow;
+        player = null;
+        await p.dispose();
+        if (!mounted || generation != loadGeneration) return;
+        p = VideoPlayerController.asset(path);
+        player = p;
+        await p.initialize();
+      }
       if (!mounted || player != p) return;
       await p.setLooping(true);
       if (widget.active && routeVisible) await p.play();
@@ -2311,7 +2493,7 @@ class _ReelsState extends State<Reels> with WidgetsBindingObserver, RouteAware {
                     label: liked ? 'Liked' : 'Like',
                     icon: liked ? 2 : 1,
                     selected: liked,
-                    onTap: () => store.toggle('likes', id),
+                    onTap: () => toggleLike(c, id),
                   ),
                   const SizedBox(height: 8),
                   ReelAction(
@@ -2356,6 +2538,8 @@ class Comments extends StatefulWidget {
 class _CommentsState extends State<Comments> {
   final field = TextEditingController();
   final scroll = ScrollController();
+  bool sending = false;
+  String? pendingText, pendingId;
   void refresh() {
     if (mounted) setState(() {});
   }
@@ -2543,7 +2727,8 @@ class _CommentsState extends State<Comments> {
     );
   }
 
-  void send() {
+  Future<void> send() async {
+    if (sending) return;
     final t = field.text.trim();
     if (!allowed(t)) {
       notice(
@@ -2553,13 +2738,39 @@ class _CommentsState extends State<Comments> {
       );
       return;
     }
-    store.addRecord('comments', {
-      'content': widget.id,
-      'id': DateTime.now().microsecondsSinceEpoch.toString(),
-      'author': store.get('nickname', 'Nani Kohli'),
-      'text': t,
-    });
-    field.clear();
+    final remote = store.social;
+    if (remote == null) {
+      notice(
+        context,
+        'Comment not sent',
+        'Please check your connection and try again.',
+      );
+      return;
+    }
+    if (pendingText != t) {
+      pendingText = t;
+      pendingId = SocialStore.newMessageId();
+    }
+    setState(() => sending = true);
+    try {
+      await remote
+          .sendComment(widget.id, t, pendingId!)
+          .timeout(const Duration(seconds: 20));
+      if (!mounted) return;
+      if (field.text.trim() == t) field.clear();
+      pendingText = null;
+      pendingId = null;
+    } catch (_) {
+      if (mounted)
+        notice(
+          context,
+          'Comment not sent',
+          'Please check your connection and try again.',
+        );
+      return;
+    } finally {
+      if (mounted) setState(() => sending = false);
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !scroll.hasClients) return;
       scroll.jumpTo(scroll.position.maxScrollExtent);
@@ -2701,7 +2912,11 @@ class _RoomsState extends State<Rooms> {
   ];
   @override
   Widget build(BuildContext c) {
-    var rooms = [...store.records('rooms'), ...roomSeeds].where((r) {
+    final editorialRooms =
+        ((store.data['editorialRooms'] as List?) ?? roomSeeds)
+            .map((room) => Map<String, dynamic>.from(room as Map))
+            .toList();
+    var rooms = [...store.records('rooms'), ...editorialRooms].where((r) {
       final host = 'member-${r['host'] ?? '0'}';
       final text = '${r['title']} ${r['summary']}'.toLowerCase();
       return !store.list('blocked').contains(host) &&
@@ -3858,18 +4073,40 @@ class _LiveRoomState extends State<LiveRoom>
         sampleCursor++;
       });
     });
-    p = VideoPlayerController.asset(
-      'assets/videos/${store.data['liveVideos'][store.members.where((m) => m.live).toList().indexWhere((m) => m.id == widget.member.id) % 9]}',
-    );
-    p!
-        .initialize()
-        .then((_) {
-          if (!mounted) return;
-          p!.setLooping(true);
-          if (routeVisible) p!.play();
-          setState(() {});
-        })
-        .catchError((_) {});
+    loadVideo();
+  }
+
+  Future<void> loadVideo() async {
+    final video =
+        store.data['liveVideos'][store.members
+                .where((m) => m.live)
+                .toList()
+                .indexWhere((m) => m.id == widget.member.id) %
+            9];
+    final path = 'assets/videos/$video';
+    var controller = store.cloudContentLoaded
+        ? VideoPlayerController.networkUrl(TotiCloud.mediaUrl(path))
+        : VideoPlayerController.asset(path);
+    p = controller;
+    try {
+      try {
+        await controller.initialize();
+      } catch (_) {
+        if (!store.cloudContentLoaded || !mounted || p != controller) rethrow;
+        p = null;
+        await controller.dispose();
+        if (!mounted) return;
+        controller = VideoPlayerController.asset(path);
+        p = controller;
+        await controller.initialize();
+      }
+      if (!mounted || p != controller) return;
+      await controller.setLooping(true);
+      if (routeVisible && appActive) await controller.play();
+      if (mounted && p == controller) setState(() {});
+    } catch (_) {
+      if (mounted) setState(() {});
+    }
   }
 
   @override
@@ -4398,6 +4635,22 @@ class _InboxState extends State<Inbox> {
   String tab = 'Message';
 
   @override
+  void initState() {
+    super.initState();
+    store.addListener(_changed);
+  }
+
+  void _changed() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    store.removeListener(_changed);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext c) {
     final notices = store
         .records('notices')
@@ -4519,8 +4772,8 @@ class _InboxState extends State<Inbox> {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(color: Color(0xffd8c9de), fontSize: 12),
               ),
-              const TText(
-                'Only visible to you',
+              TText(
+                member.authId == null ? 'Only visible to you' : 'Conversation',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: muted, fontSize: 11),
@@ -4548,8 +4801,8 @@ class _InboxState extends State<Inbox> {
               fontWeight: FontWeight.w700,
             ),
           ),
-          subtitle: const TText(
-            'Example profile · Following',
+          subtitle: TText(
+            member.authId == null ? 'Example profile · Following' : 'Following',
             style: TextStyle(color: muted, fontSize: 12),
           ),
           trailing: actionArtwork(4, size: 18),
@@ -4561,6 +4814,11 @@ class _InboxState extends State<Inbox> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
       children: [
+        if (store.social?.error != null)
+          TextButton(
+            onPressed: () => store.social?.retry(),
+            child: TText(store.social!.error!),
+          ),
         IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -4763,8 +5021,22 @@ class Conversation extends StatefulWidget {
 
 class _ConversationState extends State<Conversation> {
   final field = TextEditingController();
+  bool sending = false;
+  String? pendingText, pendingId;
+
+  @override
+  void initState() {
+    super.initState();
+    store.addListener(_changed);
+  }
+
+  void _changed() {
+    if (mounted) setState(() {});
+  }
+
   @override
   void dispose() {
+    store.removeListener(_changed);
     field.dispose();
     super.dispose();
   }
@@ -4781,24 +5053,27 @@ class _ConversationState extends State<Conversation> {
       m.name,
       Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.all(10),
-            child: TText(
-              'Only you can see these messages; they are not sent to anyone.',
-              style: TextStyle(color: muted),
+          if (m.authId == null)
+            const Padding(
+              padding: EdgeInsets.all(10),
+              child: TText(
+                'Only you can see these messages; they are not sent to anyone.',
+                style: TextStyle(color: muted),
+              ),
             ),
-          ),
           Expanded(
             child: ListView(
               children: [
                 for (final msg in messages)
                   Align(
-                    alignment: Alignment.centerRight,
+                    alignment: msg['_mine'] == false
+                        ? Alignment.centerLeft
+                        : Alignment.centerRight,
                     child: Container(
                       margin: const EdgeInsets.all(8),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: pink,
+                        color: msg['_mine'] == false ? panel2 : pink,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: TText(msg['text']),
@@ -4849,7 +5124,8 @@ class _ConversationState extends State<Conversation> {
               ],
             ),
           ),
-          composer(field, () {
+          composer(field, () async {
+            if (sending) return;
             if (!store.mutual(m)) {
               notice(
                 c,
@@ -4864,6 +5140,42 @@ class _ConversationState extends State<Conversation> {
                 'Message not sent',
                 'Please enter a clear, safe message.',
               );
+              return;
+            }
+            if (m.authId != null) {
+              final remote = store.social;
+              if (remote == null) {
+                notice(
+                  c,
+                  'Message not sent',
+                  'Please check your connection and try again.',
+                );
+                return;
+              }
+              final text = field.text.trim();
+              if (pendingText != text) {
+                pendingText = text;
+                pendingId = SocialStore.newMessageId();
+              }
+              setState(() => sending = true);
+              try {
+                await remote
+                    .send(m.authId!, text, pendingId!)
+                    .timeout(const Duration(seconds: 20));
+                if (!mounted) return;
+                if (field.text.trim() == text) field.clear();
+                pendingText = null;
+                pendingId = null;
+              } catch (_) {
+                if (mounted)
+                  notice(
+                    c,
+                    'Message not sent',
+                    'Please check your connection and try again.',
+                  );
+              } finally {
+                if (mounted) setState(() => sending = false);
+              }
               return;
             }
             store.addRecord('messages', {
@@ -5151,7 +5463,11 @@ class Moments extends StatelessWidget {
           'member': 'member-8',
         },
       ];
-      final all = [...moments, ...seed]
+      final editorialMoments =
+          ((store.data['editorialMoments'] as List?) ?? seed)
+              .map((moment) => Map<String, dynamic>.from(moment as Map))
+              .toList();
+      final all = [...moments, ...editorialMoments]
           .where(
             (e) =>
                 !store.list('blocked').contains(e['member']) &&
@@ -5210,7 +5526,7 @@ class Moments extends StatelessWidget {
                           children: [
                             TextButton(
                               onPressed: () =>
-                                  store.toggle('likes', 'moment:${e['id']}'),
+                                  toggleLike(c, 'moment:${e['id']}'),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -5759,29 +6075,106 @@ class _EditProfileState extends State<EditProfile> {
       return;
     }
     setState(() => saving = true);
+    final account = store.activeUserId;
     String? avatarPath;
+    String? uploadedAvatar;
+    late Map<String, dynamic> savedProfile;
     try {
       if (selectedAvatar != null) {
         final directory = await getApplicationDocumentsDirectory();
         avatarPath =
             '${directory.path}/toti_avatar_${DateTime.now().microsecondsSinceEpoch}';
+        if (await File(selectedAvatar!.path).length() > 10 * 1024 * 1024) {
+          throw const FormatException('Image is too large');
+        }
         await File(selectedAvatar!.path).copy(avatarPath);
+        final lower = selectedAvatar!.path.toLowerCase();
+        final guessedMime = lower.endsWith('.png')
+            ? 'image/png'
+            : lower.endsWith('.webp')
+            ? 'image/webp'
+            : lower.endsWith('.gif')
+            ? 'image/gif'
+            : lower.endsWith('.heic')
+            ? 'image/heic'
+            : lower.endsWith('.heif')
+            ? 'image/heif'
+            : lower.endsWith('.jpg') || lower.endsWith('.jpeg')
+            ? 'image/jpeg'
+            : 'application/octet-stream';
+        final bytes = await File(selectedAvatar!.path).readAsBytes();
+        final mime =
+            lookupMimeType(
+              selectedAvatar!.path,
+              headerBytes: bytes.take(defaultMagicNumbersMaxLength).toList(),
+            ) ??
+            selectedAvatar!.mimeType ??
+            guessedMime;
+        if (bytes.length > 10 * 1024 * 1024 ||
+            !{
+              'image/jpeg',
+              'image/png',
+              'image/webp',
+              'image/gif',
+              'image/heic',
+              'image/heif',
+            }.contains(mime)) {
+          throw const FormatException('Unsupported image');
+        }
+        uploadedAvatar = await TotiCloud.uploadAvatar(bytes, mime);
       }
-    } catch (_) {
+      savedProfile = await TotiCloud.saveProfile({
+        'nickname': name.text.trim(),
+        'gender': gender,
+        'birthday': birthday.text,
+        'country': country.text.trim(),
+        'avatar_key': uploadedAvatar ?? store.get('avatar_key', null),
+      });
+    } on FormatException {
+      if (avatarPath != null) {
+        try {
+          await File(avatarPath).delete();
+        } catch (_) {}
+      }
       if (mounted) {
         setState(() => saving = false);
-        notice(context, 'Could not save photo', 'Please try again.');
+        notice(
+          context,
+          'Could not save photo',
+          'Choose an image under 10 MB and try again.',
+        );
+      }
+      return;
+    } catch (_) {
+      if (avatarPath != null) {
+        try {
+          await File(avatarPath).delete();
+        } catch (_) {}
+      }
+      if (mounted) {
+        setState(() => saving = false);
+        notice(
+          context,
+          'Could not save profile',
+          'Please check your connection and try again.',
+        );
       }
       return;
     }
-    if (!mounted) return;
-    store.state.addAll({
-      'nickname': name.text.trim(),
-      'gender': gender,
-      'birthday': birthday.text,
-      'country': country.text.trim(),
-    });
-    if (avatarPath != null) store.state['avatarPath'] = avatarPath;
+    if (!mounted || account == null || store.activeUserId != account) return;
+    store.state.addAll(savedProfile);
+    if (avatarPath != null) {
+      final owned = List<String>.from(store.get('ownedAvatarPaths', []));
+      final previous = store.get('avatarPath', '');
+      if (previous is String &&
+          previous.isNotEmpty &&
+          !owned.contains(previous)) {
+        owned.add(previous);
+      }
+      owned.add(avatarPath);
+      store.state['ownedAvatarPaths'] = owned;
+      store.state['avatarPath'] = avatarPath;
+    }
     store.save();
     Navigator.pop(context);
   }
@@ -5820,6 +6213,11 @@ class _EditProfileState extends State<EditProfile> {
           ),
         ),
         const SizedBox(height: 16),
+        const TText(
+          'Your profile and photo can be seen by other signed-in members.',
+          style: TextStyle(color: muted, fontSize: 12),
+        ),
+        const SizedBox(height: 12),
         TextField(
           controller: name,
           maxLength: 40,
@@ -6476,9 +6874,14 @@ class Settings extends StatelessWidget {
                 ListTile(
                   title: const TText('Sign out'),
                   trailing: actionArtwork(4, size: 18),
-                  onTap: () {
-                    store.put('signedIn', false);
-                    Navigator.popUntil(c, (r) => r.isFirst);
+                  onTap: () async {
+                    store.logout();
+                    try {
+                      await TotiCloud.signOut();
+                    } catch (_) {
+                      // The SDK removes the local session before contacting Auth.
+                    }
+                    if (c.mounted) Navigator.popUntil(c, (r) => r.isFirst);
                   },
                 ),
                 ListTile(
@@ -6501,6 +6904,8 @@ class Settings extends StatelessWidget {
                         ),
                         TextButton(
                           onPressed: () async {
+                            final deletingUser = store.activeUserId;
+                            if (deletingUser == null) return;
                             try {
                               for (final item in store.records('pending')) {
                                 final path = item['path'];
@@ -6509,6 +6914,26 @@ class Settings extends StatelessWidget {
                                   await File(path).delete();
                                 }
                               }
+                              final directory =
+                                  await getApplicationDocumentsDirectory();
+                              final prefix = '${directory.path}/toti_avatar_';
+                              final avatarPaths = {
+                                ...List<String>.from(
+                                  store.get('ownedAvatarPaths', []),
+                                ),
+                                if (store.get('avatarPath', '') is String)
+                                  store.get('avatarPath', '') as String,
+                              };
+                              for (final path in avatarPaths) {
+                                if (path.startsWith(prefix) &&
+                                    !path
+                                        .substring(prefix.length)
+                                        .contains('/') &&
+                                    await File(path).exists()) {
+                                  await File(path).delete();
+                                }
+                              }
+                              await TotiCloud.deleteAccount(deletingUser);
                             } catch (_) {
                               if (d.mounted) {
                                 notice(
@@ -6519,7 +6944,8 @@ class Settings extends StatelessWidget {
                               }
                               return;
                             }
-                            store.clear();
+                            if (store.activeUserId != deletingUser) return;
+                            await store.clear();
                             if (d.mounted) Navigator.pop(d);
                             if (c.mounted) {
                               Navigator.popUntil(c, (r) => r.isFirst);
@@ -6566,7 +6992,18 @@ class Blocked extends StatelessWidget {
                         leading: avatar(m.image),
                         title: TText(m.name),
                         trailing: TextButton(
-                          onPressed: () => store.toggle('blocked', m.id),
+                          onPressed: () async {
+                            try {
+                              await store.toggle('blocked', m.id);
+                            } catch (_) {
+                              if (c.mounted)
+                                notice(
+                                  c,
+                                  'Could not unblock account',
+                                  'Please try again.',
+                                );
+                            }
+                          },
                           child: const TText('Unblock'),
                         ),
                       ),
@@ -6586,7 +7023,7 @@ class Guidelines extends StatelessWidget {
     SingleChildScrollView(
       padding: EdgeInsets.all(18),
       child: TText(
-        'Be real and be respectful\nUse an authentic identity. Do not impersonate others or manipulate follows.\n\nConsent comes first\nMessages and calls require mutual follow. Never pressure someone to follow, reply, meet or share private information.\n\nKeep people safe\nNo bullying, threats, hate speech, sexual exploitation, graphic violence, scams, spam or promotion of dangerous activity.\n\nProtect privacy\nDo not publish another person’s private information, intimate media or location without permission.\n\nUse safety tools\nReport content that violates these rules. Block a person when you do not want to see their profile, content or conversations. Reports and blocks hide affected content from your view; reports are not sent to a moderation service.',
+        'Be real and be respectful\nUse an authentic identity. Do not impersonate others or manipulate follows.\n\nConsent comes first\nMessages and calls require mutual follow. Never pressure someone to follow, reply, meet or share private information.\n\nKeep people safe\nNo bullying, threats, hate speech, sexual exploitation, graphic violence, scams, spam or promotion of dangerous activity.\n\nProtect privacy\nDo not publish another person’s private information, intimate media or location without permission.\n\nUse safety tools\nReport content that violates these rules. Block a person when you do not want to see their profile, content or conversations. Reports are submitted to Toti, and the affected content is hidden from your view.',
       ),
     ),
   );
