@@ -7,6 +7,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:livekit_client/livekit_client.dart' as lk;
 import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show AuthException;
@@ -15,6 +16,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'store.dart';
 import 'cloud.dart';
 import 'social.dart';
+import 'rtc.dart';
 
 const termsUrl = String.fromEnvironment(
   'TOTI_TERMS_URL',
@@ -38,6 +40,7 @@ final linkStyle = TextButton.styleFrom(
   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
 );
 late AppStore store;
+RtcDirectory? rtcDirectory;
 final routeObserver = RouteObserver<PageRoute<dynamic>>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -1222,9 +1225,19 @@ class Shell extends StatefulWidget {
 
 class _ShellState extends State<Shell> {
   int tab = 1;
+  bool incomingCallVisible = false;
+  final Set<String> handledCalls = {};
+
   @override
   void initState() {
     super.initState();
+    final userId = store.activeUserId;
+    if (userId != null) {
+      final directory = RtcDirectory(userId);
+      rtcDirectory = directory;
+      directory.addListener(checkIncomingCall);
+      directory.start();
+    }
     if (store.get('welcomeShown', false) != true) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -1319,6 +1332,79 @@ class _ShellState extends State<Shell> {
         );
       });
     }
+  }
+
+  void checkIncomingCall() {
+    final directory = rtcDirectory;
+    if (!mounted || directory == null || incomingCallVisible) return;
+    for (final session in directory.sessions) {
+      final id = session['id'];
+      if (id is! String ||
+          handledCalls.contains(id) ||
+          session['peer_id'] != directory.userId ||
+          session['status'] != 'ringing')
+        continue;
+      incomingCallVisible = true;
+      handledCalls.add(id);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) showIncomingCall(session);
+      });
+      break;
+    }
+  }
+
+  Future<void> showIncomingCall(Map<String, dynamic> session) async {
+    final directory = rtcDirectory;
+    if (directory == null) return;
+    final owner = session['owner_id'] as String;
+    final id = session['id'] as String;
+    final member = store.members.where((m) => m.authId == owner).firstOrNull;
+    final accepted = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        title: TText(
+          session['kind'] == 'video_call' ? 'Video call' : 'Voice call',
+        ),
+        content: TText('${member?.name ?? 'Someone'} is calling you.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const TText('Decline'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const TText('Accept'),
+          ),
+        ],
+      ),
+    );
+    try {
+      await directory.update(id, accepted == true ? 'accept' : 'decline');
+      if (accepted == true && mounted) {
+        open(context, RtcSessionPage(session));
+      }
+    } catch (_) {
+      if (mounted && accepted == true) {
+        notice(
+          context,
+          'Call unavailable',
+          'The call has ended or could not be connected.',
+        );
+      }
+    } finally {
+      incomingCallVisible = false;
+      if (mounted) checkIncomingCall();
+    }
+  }
+
+  @override
+  void dispose() {
+    final directory = rtcDirectory;
+    rtcDirectory = null;
+    directory?.removeListener(checkIncomingCall);
+    directory?.dispose();
+    super.dispose();
   }
 
   @override
@@ -1527,6 +1613,7 @@ class _DiscoverState extends State<Discover> {
   void initState() {
     super.initState();
     store.addListener(_changed);
+    rtcDirectory?.addListener(_changed);
   }
 
   void _changed() {
@@ -1536,7 +1623,20 @@ class _DiscoverState extends State<Discover> {
   @override
   void dispose() {
     store.removeListener(_changed);
+    rtcDirectory?.removeListener(_changed);
     super.dispose();
+  }
+
+  Map<String, dynamic>? liveSession(Member member) {
+    if (member.authId == null) return null;
+    return rtcDirectory?.sessions
+        .where(
+          (session) =>
+              session['kind'] == 'live' &&
+              session['status'] == 'active' &&
+              session['owner_id'] == member.authId,
+        )
+        .firstOrNull;
   }
 
   static const regions = [
@@ -1688,7 +1788,7 @@ class _DiscoverState extends State<Discover> {
               !store.list('blocked').contains(m.id) &&
               (category == 'All' ||
                   category == 'New' ||
-                  (category == 'Live' && m.live) ||
+                  (category == 'Live' && (m.live || liveSession(m) != null)) ||
                   (category == 'Follow' &&
                       store.list('following').contains(m.id))) &&
               (region == 'Global' || m.region == region) &&
@@ -1871,8 +1971,11 @@ class _DiscoverState extends State<Discover> {
                     itemCount: members.length,
                     itemBuilder: (c, i) {
                       final m = members[i];
+                      final live = liveSession(m);
                       return TotiPressable(
-                        onTap: () => m.live
+                        onTap: () => live != null
+                            ? open(c, RtcSessionPage(live))
+                            : m.live
                             ? open(c, LiveRoom(m))
                             : open(c, MemberPage(m)),
                         child: ClipRRect(
@@ -1912,7 +2015,7 @@ class _DiscoverState extends State<Discover> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    if (m.live)
+                                    if (m.live || live != null)
                                       const TText(
                                         'LIVE',
                                         style: TextStyle(
@@ -2167,11 +2270,13 @@ class MemberPage extends StatelessWidget {
   );
 }
 
-void openMemberCall(
+final Set<String> pendingRtcCalls = {};
+
+Future<void> openMemberCall(
   BuildContext context,
   Member member, {
   required bool video,
-}) {
+}) async {
   if (!store.mutual(member)) {
     notice(
       context,
@@ -2180,7 +2285,34 @@ void openMemberCall(
     );
     return;
   }
-  open(context, CallPreview(member, video: video));
+  final peerId = member.authId;
+  if (peerId == null) {
+    open(context, CallPreview(member, video: video));
+    return;
+  }
+  final directory = rtcDirectory;
+  if (directory == null || !pendingRtcCalls.add(peerId)) return;
+  try {
+    final session = await directory.startSession(
+      kind: video ? 'video_call' : 'voice_call',
+      peerId: peerId,
+    );
+    if (context.mounted) {
+      open(context, RtcSessionPage(session));
+    } else {
+      await directory.update(session['id'] as String, 'end');
+    }
+  } catch (_) {
+    if (context.mounted) {
+      notice(
+        context,
+        'Call unavailable',
+        'Please check your connection and try again.',
+      );
+    }
+  } finally {
+    pendingRtcCalls.remove(peerId);
+  }
 }
 
 Widget memberCallButton({
@@ -3163,6 +3295,23 @@ class _RoomsState extends State<Rooms> {
     'Turkey',
     'China',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    rtcDirectory?.addListener(refreshRooms);
+  }
+
+  void refreshRooms() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    rtcDirectory?.removeListener(refreshRooms);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext c) {
     final editorialRooms =
@@ -3181,6 +3330,18 @@ class _RoomsState extends State<Rooms> {
           text.contains(query.toLowerCase());
     }).toList();
     if (tab == 'Recent') rooms = rooms.reversed.toList();
+    final liveRooms = (rtcDirectory?.sessions ?? []).where((session) {
+      final kind = session['kind'];
+      final owner = session['owner_id'];
+      return (kind == 'voice_room' || kind == 'live') &&
+          session['status'] == 'active' &&
+          (tab != 'Follow' ||
+              store.list('following').contains('user:$owner')) &&
+          audience == 'All' &&
+          ('${session['title']} ${session['summary']}'.toLowerCase().contains(
+            query.toLowerCase(),
+          ));
+    }).toList();
     return Column(
       children: [
         Padding(
@@ -3317,7 +3478,7 @@ class _RoomsState extends State<Rooms> {
           ),
         ),
         Expanded(
-          child: rooms.isEmpty
+          child: rooms.isEmpty && liveRooms.isEmpty
               ? emptyState('No rooms found')
               : LayoutBuilder(
                   builder: (c, box) {
@@ -3327,8 +3488,21 @@ class _RoomsState extends State<Rooms> {
                     return ListView(
                       padding: const EdgeInsets.fromLTRB(14, 0, 14, 24),
                       children: [
-                        roomTile(c, rooms.first, box.maxWidth - 28, 172),
-                        const SizedBox(height: 10),
+                        if (liveRooms.isNotEmpty) ...[
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: [
+                              for (final session in liveRooms)
+                                realRoomTile(c, session, width, 198),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                        ],
+                        if (rooms.isNotEmpty) ...[
+                          roomTile(c, rooms.first, box.maxWidth - 28, 172),
+                          const SizedBox(height: 10),
+                        ],
                         Wrap(
                           spacing: 10,
                           runSpacing: 10,
@@ -3343,6 +3517,102 @@ class _RoomsState extends State<Rooms> {
                 ),
         ),
       ],
+    );
+  }
+
+  Widget realRoomTile(
+    BuildContext c,
+    Map<String, dynamic> session,
+    double width,
+    double height,
+  ) {
+    final owner = store.members
+        .where((member) => member.authId == session['owner_id'])
+        .firstOrNull;
+    return SizedBox(
+      width: width,
+      height: height,
+      child: TotiPressable(
+        onTap: () => open(c, RtcSessionPage(session)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (owner != null)
+                photo(owner.image)
+              else
+                Image.asset(
+                  'assets/art/presence-constellation-field.png',
+                  fit: BoxFit.cover,
+                ),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.center,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.transparent, Colors.black87],
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: pink,
+                    borderRadius: BorderRadius.circular(9),
+                  ),
+                  child: TText(
+                    session['kind'] == 'live' ? 'LIVE' : 'Voice room',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 12,
+                right: 12,
+                bottom: 12,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TText(
+                      session['title'] as String? ?? '',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    TText(
+                      owner?.name ?? 'Toti member',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    if ((session['summary'] as String? ?? '').isNotEmpty)
+                      TText(
+                        session['summary'] as String,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 11),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -3486,6 +3756,7 @@ class RoomEditor extends StatefulWidget {
 class _RoomEditorState extends State<RoomEditor> {
   final title = TextEditingController(), summary = TextEditingController();
   String topic = 'Conversation';
+  bool creating = false;
   @override
   void dispose() {
     title.dispose();
@@ -3533,7 +3804,8 @@ class _RoomEditorState extends State<RoomEditor> {
           ],
         ),
         const SizedBox(height: 20),
-        action('Create room', () {
+        action('Create room', () async {
+          if (creating) return;
           if (title.text.trim().length < 3 ||
               summary.text.trim().length < 8 ||
               !allowed(title.text) ||
@@ -3545,16 +3817,34 @@ class _RoomEditorState extends State<RoomEditor> {
             );
             return;
           }
-          final room = {
-            'title': title.text.trim(),
-            'summary': summary.text.trim(),
-            'host': '0',
-            'tag': topic,
-            'id': DateTime.now().microsecondsSinceEpoch.toString(),
-          };
-          store.addRecord('rooms', room);
-          Navigator.pop(c);
-          open(c, RoomPage(room));
+          final directory = rtcDirectory;
+          if (directory == null) return;
+          setState(() => creating = true);
+          try {
+            final session = await directory.startSession(
+              kind: 'voice_room',
+              title: title.text.trim(),
+              summary: summary.text.trim(),
+              tag: topic,
+            );
+            if (!mounted || !c.mounted) {
+              await directory.update(session['id'] as String, 'end');
+              return;
+            }
+            await Navigator.of(c).pushReplacement(
+              MaterialPageRoute(builder: (_) => RtcSessionPage(session)),
+            );
+          } catch (_) {
+            if (mounted && c.mounted) {
+              notice(
+                c,
+                'Room unavailable',
+                'Please check your connection and try again.',
+              );
+            }
+          } finally {
+            if (mounted) setState(() => creating = false);
+          }
         }, primary: true),
       ],
     ),
@@ -5341,32 +5631,12 @@ class _ConversationState extends State<Conversation> {
             child: Row(
               children: [
                 TextButton(
-                  onPressed: () {
-                    if (store.mutual(m)) {
-                      open(c, CallPreview(m, video: false));
-                    } else {
-                      notice(
-                        c,
-                        'Mutual follow required',
-                        'Both people must follow each other.',
-                      );
-                    }
-                  },
+                  onPressed: () => openMemberCall(c, m, video: false),
                   child: iconLabel(utilityArtwork(0, size: 18), 'Voice call'),
                 ),
                 const SizedBox(width: 8),
                 TextButton(
-                  onPressed: () {
-                    if (store.mutual(m)) {
-                      open(c, CallPreview(m, video: true));
-                    } else {
-                      notice(
-                        c,
-                        'Mutual follow required',
-                        'Both people must follow each other.',
-                      );
-                    }
-                  },
+                  onPressed: () => openMemberCall(c, m, video: true),
                   child: iconLabel(utilityArtwork(1, size: 18), 'Video call'),
                 ),
                 const SizedBox(width: 8),
@@ -5653,6 +5923,443 @@ class _CallPreviewState extends State<CallPreview> with WidgetsBindingObserver {
       ],
     ),
   );
+}
+
+class RtcSessionPage extends StatefulWidget {
+  const RtcSessionPage(this.session, {super.key});
+  final Map<String, dynamic> session;
+
+  @override
+  State<RtcSessionPage> createState() => _RtcSessionPageState();
+}
+
+class _RtcSessionPageState extends State<RtcSessionPage>
+    with WidgetsBindingObserver {
+  late final String id = widget.session['id'] as String;
+  late final String kind = widget.session['kind'] as String;
+  late final bool owner = widget.session['owner_id'] == store.activeUserId;
+  late final bool call = kind == 'voice_call' || kind == 'video_call';
+  late final RtcConnection connection = RtcConnection(id);
+  final field = TextEditingController();
+  Timer? heartbeat;
+  bool connecting = true, microphone = false, camera = false, sending = false;
+  bool closed = false, hasSeenSession = false;
+  String? error;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    connection.addListener(refresh);
+    rtcDirectory?.addListener(sessionChanged);
+    hasSeenSession = rtcDirectory?.session(id) != null;
+    start();
+  }
+
+  void refresh() {
+    if (mounted) setState(() {});
+  }
+
+  void sessionChanged() {
+    final directory = rtcDirectory;
+    if (!mounted || directory == null || directory.error != null || closed)
+      return;
+    final current = directory.session(id);
+    if (current != null) {
+      hasSeenSession = true;
+      setState(() {});
+    } else if (hasSeenSession && !connecting) {
+      closeConnection('This session has ended.');
+    }
+  }
+
+  Future<void> start() async {
+    if (closed) return;
+    setState(() {
+      connecting = true;
+      error = null;
+    });
+    try {
+      final initialMic =
+          call || (owner && (kind == 'live' || kind == 'voice_room'));
+      final initialCamera = kind == 'video_call' || (owner && kind == 'live');
+      await connection.connect(microphone: initialMic, camera: initialCamera);
+      if (!mounted || closed) return;
+      microphone = initialMic;
+      camera = initialCamera;
+      if (owner && !call) {
+        final directory = rtcDirectory;
+        if (directory == null) throw StateError('Session unavailable');
+        await directory.update(id, 'publish');
+      }
+      if (!mounted || closed) return;
+      setState(() => connecting = false);
+      if (owner) {
+        heartbeat = Timer.periodic(const Duration(seconds: 40), (_) async {
+          try {
+            await rtcDirectory?.update(id, 'heartbeat');
+          } catch (_) {
+            // A ringing call cannot be extended before it is accepted.
+          }
+        });
+      }
+      sessionChanged();
+    } catch (_) {
+      try {
+        await connection.disconnect();
+      } catch (_) {}
+      if (mounted && !closed) {
+        setState(() {
+          connecting = false;
+          error = 'Could not connect. Check your connection and permissions.';
+        });
+      }
+    }
+  }
+
+  void closeConnection(String message) {
+    if (closed) return;
+    closed = true;
+    heartbeat?.cancel();
+    connection.removeListener(refresh);
+    connection.dispose();
+    if (mounted) setState(() => error = message);
+  }
+
+  Future<void> toggleMicrophone() async {
+    if (closed || connecting) return;
+    try {
+      final participant = connection.room?.localParticipant;
+      if (participant == null) throw StateError('Not connected');
+      if (!microphone) await requireRtcPermission(camera: false);
+      await participant.setMicrophoneEnabled(!microphone);
+      if (mounted) setState(() => microphone = !microphone);
+    } catch (_) {
+      if (mounted)
+        notice(
+          context,
+          'Microphone unavailable',
+          'Check your microphone permission.',
+        );
+    }
+  }
+
+  Future<void> toggleCamera() async {
+    if (closed || connecting) return;
+    try {
+      final participant = connection.room?.localParticipant;
+      if (participant == null) throw StateError('Not connected');
+      if (!camera) await requireRtcPermission(camera: true);
+      await participant.setCameraEnabled(!camera);
+      if (mounted) setState(() => camera = !camera);
+    } catch (_) {
+      if (mounted)
+        notice(context, 'Camera unavailable', 'Check your camera permission.');
+    }
+  }
+
+  Future<void> sendMessage() async {
+    final text = field.text.trim();
+    if (sending || !allowed(text) || text.length > 300) return;
+    setState(() => sending = true);
+    try {
+      await connection.sendMessage(text);
+      if (mounted && field.text.trim() == text) field.clear();
+    } catch (_) {
+      if (mounted) notice(context, 'Message not sent', 'Please try again.');
+    } finally {
+      if (mounted) setState(() => sending = false);
+    }
+  }
+
+  String nameFor(String id) {
+    if (id == store.activeUserId) return store.get('nickname', 'You') as String;
+    return store.members
+            .where((member) => member.authId == id)
+            .firstOrNull
+            ?.name ??
+        'Toti member';
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.paused || closed) return;
+    final participant = connection.room?.localParticipant;
+    if (participant == null) return;
+    if (microphone) {
+      unawaited(
+        participant
+            .setMicrophoneEnabled(false)
+            .then<void>((_) {})
+            .catchError((_) {}),
+      );
+    }
+    if (camera) {
+      unawaited(
+        participant
+            .setCameraEnabled(false)
+            .then<void>((_) {})
+            .catchError((_) {}),
+      );
+    }
+    if (mounted)
+      setState(() {
+        microphone = false;
+        camera = false;
+      });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    rtcDirectory?.removeListener(sessionChanged);
+    heartbeat?.cancel();
+    if (!closed) {
+      connection.removeListener(refresh);
+      connection.dispose();
+    }
+    if (owner || call) {
+      final directory = rtcDirectory;
+      if (directory != null) {
+        unawaited(directory.update(id, 'end').catchError((_) {}));
+      }
+    }
+    field.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext c) {
+    final title = call
+        ? nameFor(
+            (owner ? widget.session['peer_id'] : widget.session['owner_id'])
+                as String,
+          )
+        : (widget.session['title'] as String? ?? 'Toti');
+    final remote = connection.remoteVideo;
+    final local = connection.localVideo;
+    final mainVideo = owner && kind == 'live' ? local : remote;
+    final participants = [
+      if (connection.room?.localParticipant != null)
+        connection.room!.localParticipant!.identity,
+      ...?connection.room?.remoteParticipants.values.map(
+        (participant) => participant.identity,
+      ),
+    ];
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: bg,
+      body: SafeArea(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (mainVideo != null)
+              lk.VideoTrackRenderer(mainVideo, fit: lk.VideoViewFit.cover)
+            else
+              Image.asset(
+                'assets/art/presence-constellation-field.png',
+                fit: BoxFit.cover,
+              ),
+            Container(
+              color: Colors.black.withValues(
+                alpha: mainVideo == null ? .55 : .25,
+              ),
+            ),
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 4),
+                  child: Row(
+                    children: [
+                      memberIconButton(
+                        label: 'Back',
+                        artwork: 0,
+                        onTap: () => Navigator.pop(c),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TText(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      if (kind == 'live' && !connecting && !closed)
+                        const TText(
+                          'LIVE',
+                          style: TextStyle(
+                            color: Color(0xffff61bd),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (error != null) ...[
+                          const Spacer(),
+                          Center(
+                            child: TText(error!, textAlign: TextAlign.center),
+                          ),
+                          if (!closed)
+                            Center(
+                              child: TextButton(
+                                onPressed: start,
+                                child: const TText('Try again'),
+                              ),
+                            ),
+                          const Spacer(),
+                        ] else if (connecting) ...[
+                          const Spacer(),
+                          const Center(
+                            child: CircularProgressIndicator(color: pink),
+                          ),
+                          const SizedBox(height: 12),
+                          const Center(child: TText('Connecting…')),
+                          const Spacer(),
+                        ] else ...[
+                          if (call &&
+                              connection.room?.remoteParticipants.isEmpty ==
+                                  true)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 16),
+                              child: TText('Waiting for the other person…'),
+                            ),
+                          if (kind == 'voice_room') ...[
+                            const SizedBox(height: 24),
+                            Wrap(
+                              spacing: 12,
+                              runSpacing: 12,
+                              children: [
+                                for (final participant in participants)
+                                  SizedBox(
+                                    width: 74,
+                                    child: Column(
+                                      children: [
+                                        if (participant == store.activeUserId)
+                                          myAvatar(size: 52)
+                                        else
+                                          avatar(
+                                            store.members
+                                                    .where(
+                                                      (m) =>
+                                                          m.authId ==
+                                                          participant,
+                                                    )
+                                                    .firstOrNull
+                                                    ?.image ??
+                                                'riverside-black-dress.jpg',
+                                            size: 52,
+                                          ),
+                                        const SizedBox(height: 5),
+                                        TText(
+                                          nameFor(participant),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(fontSize: 11),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
+                          if (call && local != null && remote != null)
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: SizedBox(
+                                width: 90,
+                                height: 128,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(14),
+                                  child: lk.VideoTrackRenderer(
+                                    local,
+                                    fit: lk.VideoViewFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          const Spacer(),
+                          if (!call)
+                            for (final message
+                                in connection.messages.reversed
+                                    .take(4)
+                                    .toList()
+                                    .reversed)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 6),
+                                child: Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: '${nameFor(message.author)}: ',
+                                        style: const TextStyle(
+                                          color: Color(0xffff99d7),
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      TextSpan(text: message.text),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 4, 14, 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (call || kind == 'voice_room' || owner)
+                        VoiceRoomControl(
+                          label: microphone ? 'Mute' : 'Microphone',
+                          icon: roomToolbarArtwork(0),
+                          onTap: toggleMicrophone,
+                          active: microphone,
+                        ),
+                      if (kind == 'video_call' ||
+                          (owner && kind == 'live')) ...[
+                        const SizedBox(width: 18),
+                        VoiceRoomControl(
+                          label: camera ? 'Camera off' : 'Camera on',
+                          icon: utilityArtwork(1),
+                          onTap: toggleCamera,
+                          active: camera,
+                        ),
+                      ],
+                      const SizedBox(width: 18),
+                      VoiceRoomControl(
+                        label: call || owner ? 'End' : 'Leave',
+                        icon: controlArtwork(0),
+                        onTap: () => Navigator.pop(c),
+                      ),
+                    ],
+                  ),
+                ),
+                if (!call && !closed)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+                    child: composer(field, sendMessage),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 void createMenu(BuildContext c) {
@@ -7291,6 +7998,7 @@ class LiveSetup extends StatefulWidget {
 
 class _LiveSetupState extends State<LiveSetup> {
   final title = TextEditingController();
+  bool starting = false;
   @override
   void dispose() {
     title.dispose();
@@ -7315,7 +8023,7 @@ class _LiveSetupState extends State<LiveSetup> {
         header('Open a live conversation'),
         const SizedBox(height: 8),
         const TText(
-          'Check your camera and microphone. Broadcasting is unavailable.',
+          'Share a live moment with the community.',
           style: TextStyle(color: muted),
         ),
         const SizedBox(height: 20),
@@ -7325,7 +8033,8 @@ class _LiveSetupState extends State<LiveSetup> {
           decoration: const InputDecoration(labelText: 'Live title'),
         ),
         const SizedBox(height: 20),
-        action('Open camera', () {
+        action('Go live', () async {
+          if (starting) return;
           final t = title.text.trim();
           if (t.length < 3 || !allowed(t)) {
             notice(
@@ -7335,7 +8044,32 @@ class _LiveSetupState extends State<LiveSetup> {
             );
             return;
           }
-          open(c, CreatorPreview(t));
+          final directory = rtcDirectory;
+          if (directory == null) return;
+          setState(() => starting = true);
+          try {
+            final session = await directory.startSession(
+              kind: 'live',
+              title: t,
+            );
+            if (!mounted || !c.mounted) {
+              await directory.update(session['id'] as String, 'end');
+              return;
+            }
+            await Navigator.of(c).pushReplacement(
+              MaterialPageRoute(builder: (_) => RtcSessionPage(session)),
+            );
+          } catch (_) {
+            if (mounted && c.mounted) {
+              notice(
+                c,
+                'Unable to go live',
+                'Please check your connection and try again.',
+              );
+            }
+          } finally {
+            if (mounted) setState(() => starting = false);
+          }
         }, primary: true),
       ],
     ),
