@@ -20,11 +20,11 @@ import 'rtc.dart';
 
 const termsUrl = String.fromEnvironment(
   'TOTI_TERMS_URL',
-  defaultValue: 'https://toti-terms-privacy.aqua-fly-0681.chatgpt.site/terms',
+  defaultValue: 'https://sites.google.com/view/toti-connect-policies/terms-of-service?hl=en',
 );
 const privacyUrl = String.fromEnvironment(
   'TOTI_PRIVACY_URL',
-  defaultValue: 'https://toti-terms-privacy.aqua-fly-0681.chatgpt.site/privacy',
+  defaultValue: 'https://sites.google.com/view/toti-connect-policies/privacy-policy?hl=en',
 );
 
 const bg = Color(0xff0a0220),
