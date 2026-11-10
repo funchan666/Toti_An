@@ -1,12 +1,12 @@
 # Toti for Android
 
-Flutter Android application based on the LookMe iOS A-side. Original project media, fonts, sample profiles and editorial content are included. The B-side routing, WebSocket and remote WebView integration are excluded. The Android application ID is `com.toticonnect.meetcommunity`; configure release signing before publishing.
+Flutter Android application based on the LookMe iOS A-side. Editorial portraits and videos are loaded from Supabase Storage; app artwork, fonts and a small editorial data fallback remain bundled. The B-side routing, WebSocket and remote WebView integration are excluded. The Android application ID is `com.toticonnect.meetcommuinity`; release signing uses the locally configured upload key.
 
 ## Current functionality
 
 The five main areas include short videos, discovery, example rooms, messages and profile. The app includes follows and sample incoming followers, comments and local safety tools; room filters, member lists, local microphone capture and example gift selection; local camera capture and call/broadcast previews; pending submissions; profile editing, daily coins, effects and backpack. English, Chinese, Spanish, Japanese and German translation dictionaries are imported from LookMe; strings not present in those dictionaries still appear in English.
 
-Editorial profiles, videos, room cards and comments have been imported to the Toti Supabase project. The app source reads them from the project, with bundled content and media retained as a transitional fallback. Real-account follow, block, direct-message, comment, like and report code uses Supabase; these flows have not been run or verified. Interactions with example profiles and room gifts remain previews. Microphone and camera previews are not broadcasts or connected calls. Submissions remain pending. Profile text, selected avatars, comments and likes are wired to Supabase; room activity, wallet state and other attachments remain on the device. The account deletion function is deployed and wired in source but has not been exercised.
+Editorial profiles, videos, room cards and comments have been imported to the Toti Supabase project. Portraits and videos are network-only, so they are unavailable if the storage service or connection is unavailable; the small bundled editorial data file still supports initial state. Real-account follow, block, direct-message, comment, like and report code uses Supabase; these flows have not been run or verified. Interactions with example profiles and room gifts remain previews. Microphone and camera previews are not broadcasts or connected calls. Submissions remain pending. Profile text, selected avatars, comments and likes are wired to Supabase; room activity, wallet state and other attachments remain on the device. The account deletion function is deployed and wired in source but has not been exercised.
 
 ## Outstanding
 

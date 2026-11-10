@@ -1,6 +1,6 @@
 # Toti Google Play consumable product plan
 
-These IDs are proposed, not registered. The selected Android application ID is `com.toticonnect.meetcommunity`; its availability and registration in Google Play have not been verified. Create the products only for that intended Toti application. Google Play product IDs cannot be changed or reused after creation. Prices below are the corresponding LookMe iOS reference values in USD, not active Google Play prices; Play Console must define the actual prices and local taxes/currencies.
+These IDs are proposed, not registered. The Android application ID is `com.toticonnect.meetcommuinity`, matching the ID provided for Google Play. Create the products only for that intended Toti application. Google Play product IDs cannot be changed or reused after creation. Prices below are the corresponding LookMe iOS reference values in USD, not active Google Play prices; Play Console must define the actual prices and local taxes/currencies.
 
 | Product ID | Coins | LookMe reference price (USD) |
 | --- | ---: | ---: |

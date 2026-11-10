@@ -2,7 +2,7 @@
 
 ## 状态与范围
 
-- 宿主为 Flutter Android；应用 ID：`com.toticonnect.meetcommunity`。按用户要求保留邮箱注册/登录界面、已有展示内容及 WebView 协议，不接 B 阶段。
+- 宿主为 Flutter Android；应用 ID：`com.toticonnect.meetcommuinity`（与用户提供的 Google Play 包名一致）。按用户要求保留邮箱注册/登录界面、已有展示内容及 WebView 协议，不接 B 阶段。
 - Supabase Buy 账户的 `funchan7777777@gmail.com` 组织中已创建独立项目 `toti-an-a-20261105`，ref `zmtihifixkymzcicbswh`，区域 `us-east-1`。已有 Inning 项目未修改。
 - Tods 原为 Swift/iOS 技能，本工程按适用目标适配 Flutter。用户最后明确改为真实邮箱登录；匿名登录已关闭，邮箱登录和邮箱确认已启用。未经实际注册/登录验收。
 - Brevo SMTP 页面已准备服务器 `smtp-relay.brevo.com`、端口 `587` 和发件名称 `Toti`；账户持有人已填写并保存 Brevo 发件配置；验证邮件返回地址已设置。2026-11-05 使用指定账号尝试注册时，邮件服务器返回 `535 5.7.8 Authentication failed`，注册失败且该账号未创建；需由账户持有人核对 SMTP 登录名和密钥后重试，验证跳转尚未实测。

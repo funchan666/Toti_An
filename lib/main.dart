@@ -342,16 +342,10 @@ Widget photo(String name, {BoxFit fit = BoxFit.cover}) {
     );
   }
   final path = 'assets/portraits/$name';
-  Widget bundled() => Image.asset(
-    path,
-    fit: fit,
-    errorBuilder: (_, _, _) => Container(color: panel2),
-  );
-  if (!store.cloudContentLoaded) return bundled();
   return Image.network(
     TotiCloud.mediaUrl(path).toString(),
     fit: fit,
-    errorBuilder: (_, _, _) => bundled(),
+    errorBuilder: (_, _, _) => Container(color: panel2),
   );
 }
 
@@ -2668,22 +2662,10 @@ class _ReelsState extends State<Reels> with WidgetsBindingObserver, RouteAware {
     }
     loadedVideo = reels[index]['video'];
     final path = 'assets/videos/$loadedVideo';
-    var p = store.cloudContentLoaded
-        ? VideoPlayerController.networkUrl(TotiCloud.mediaUrl(path))
-        : VideoPlayerController.asset(path);
+    final p = VideoPlayerController.networkUrl(TotiCloud.mediaUrl(path));
     player = p;
     try {
-      try {
-        await p.initialize();
-      } catch (_) {
-        if (!store.cloudContentLoaded || !mounted || player != p) rethrow;
-        player = null;
-        await p.dispose();
-        if (!mounted || generation != loadGeneration) return;
-        p = VideoPlayerController.asset(path);
-        player = p;
-        await p.initialize();
-      }
+      await p.initialize();
       if (!mounted || player != p) return;
       await p.setLooping(true);
       if (widget.active && routeVisible) await p.play();
@@ -4627,22 +4609,10 @@ class _LiveRoomState extends State<LiveRoom>
                 .indexWhere((m) => m.id == widget.member.id) %
             9];
     final path = 'assets/videos/$video';
-    var controller = store.cloudContentLoaded
-        ? VideoPlayerController.networkUrl(TotiCloud.mediaUrl(path))
-        : VideoPlayerController.asset(path);
+    final controller = VideoPlayerController.networkUrl(TotiCloud.mediaUrl(path));
     p = controller;
     try {
-      try {
-        await controller.initialize();
-      } catch (_) {
-        if (!store.cloudContentLoaded || !mounted || p != controller) rethrow;
-        p = null;
-        await controller.dispose();
-        if (!mounted) return;
-        controller = VideoPlayerController.asset(path);
-        p = controller;
-        await controller.initialize();
-      }
+      await controller.initialize();
       if (!mounted || p != controller) return;
       await controller.setLooping(true);
       if (routeVisible && appActive) await controller.play();
