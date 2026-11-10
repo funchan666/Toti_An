@@ -22,7 +22,7 @@ dependencies:
   supabase_flutter: ^2.18.3
   mime: ^2.1.0
   livekit_client: ^2.13.2
-  permission_handler: ^13.0.2
+  permission_handler: ^12.0.3
 
 dev_dependencies:
   flutter_test:
