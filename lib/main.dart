@@ -7187,7 +7187,7 @@ class _EditProfileState extends State<EditProfile> {
 }
 
 const coinProducts = <String, int>{
-  'toti_coins_500': 500,
+  'toti_coins_500.': 500,
   'toti_coins_1050': 1050,
   'toti_coins_1650': 1650,
   'toti_coins_2900': 2900,
@@ -7200,7 +7200,7 @@ const coinProducts = <String, int>{
 
 // Reference values from LookMe; Google Play determines the actual price.
 const coinReferencePrices = <String, String>{
-  'toti_coins_500': 'USD 0.99',
+  'toti_coins_500.': 'USD 0.99',
   'toti_coins_1050': 'USD 1.99',
   'toti_coins_1650': 'USD 2.99',
   'toti_coins_2900': 'USD 4.99',
